@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0c0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>◈ AFL · 54235 · Roche Kaiseraugst</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0c0f;--bg2:#10131a;--bg3:#161b24;--bg4:#1c232f;--ac:#00d4ff;--ac2:#0098c8;--acd:rgba(0,212,255,.12);--gr:#00e87b;--gr2:#00a858;--grd:rgba(0,232,123,.12);--yw:#ffcc00;--ywd:rgba(255,204,0,.12);--rd:#ff3b3b;--rdd:rgba(255,59,59,.12);--pu:#a78bfa;--pud:rgba(167,139,250,.12);--t1:#e4eaf2;--t2:#7d93a8;--t3:#465568;--bd:#1a2230;--bd2:#243040;--fm:'JetBrains Mono',monospace;--fs:'IBM Plex Sans',sans-serif;--rad:10px}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:var(--fs)}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+
+/* Loading */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2000;gap:10px}
+.ld-logo{font-family:var(--fm);font-size:2rem;font-weight:700;color:var(--ac);text-shadow:0 0 40px rgba(0,212,255,.35)}
+.ld-sub{font-size:.75rem;color:var(--t3);font-family:var(--fm);letter-spacing:1px}
+.ld-bar{width:120px;height:2px;background:var(--bd);border-radius:1px;overflow:hidden}
+.ld-bar::after{content:'';display:block;width:40%;height:100%;background:var(--ac);border-radius:1px;animation:ldSlide 1s ease infinite}
+@keyframes ldSlide{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+
+/* Login */
+#login{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.lg-logo{font-family:var(--fm);font-size:2rem;font-weight:700;color:var(--ac);text-shadow:0 0 40px rgba(0,212,255,.35);margin-bottom:4px}
+.lg-brand{font-family:var(--fm);font-size:.72rem;color:var(--t2);letter-spacing:2.5px;text-transform:uppercase}
+.lg-sub{font-size:.72rem;color:var(--t3);margin-bottom:28px;margin-top:2px}
+.lg-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;padding:24px 20px;width:100%;max-width:360px}
+.lg-title{font-size:1.05rem;font-weight:600;margin-bottom:18px;color:var(--t1)}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:.68rem;color:var(--t3);margin-bottom:5px;letter-spacing:.8px;text-transform:uppercase;font-family:var(--fm)}
+.fld input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:.92rem;padding:10px 14px;outline:none;font-family:var(--fs);transition:border-color .2s}
+.fld input:focus{border-color:var(--ac)}
+.btn-lg{width:100%;padding:12px;background:var(--ac);color:#000;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:var(--fs);transition:opacity .2s;margin-top:6px}
+.btn-lg:hover{opacity:.85}
+
+/* App Shell */
+#app{display:none;height:100%;flex-direction:column}
+#app.show{display:flex}
+.topbar{height:48px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
+.tb-brand{font-family:var(--fm);font-size:.85rem;color:var(--ac);font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-user{font-size:.68rem;color:var(--t3);font-family:var(--fm)}
+.btn-out{background:none;border:1px solid var(--bd2);border-radius:6px;color:var(--t3);font-size:.68rem;padding:4px 8px;cursor:pointer;font-family:var(--fm);transition:color .2s,border-color .2s}
+.btn-out:hover{color:var(--rd);border-color:var(--rd)}
+.content{flex:1;overflow:hidden;position:relative}
+.pane{position:absolute;inset:0;overflow-y:auto;padding:10px 10px 68px;display:none}
+.pane.active{display:block}
+
+/* Tabbar */
+.tabbar{height:54px;background:var(--bg2);border-top:1px solid var(--bd);display:flex;flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;background:none;border:none;color:var(--t3);font-size:.58rem;font-family:var(--fs);letter-spacing:.3px;transition:color .15s;padding-bottom:2px}
+.tab svg{width:19px;height:19px;transition:stroke .15s}
+.tab.active{color:var(--ac)}
+.tab.active svg{stroke:var(--ac)}
+
+/* Section headers */
+.sec{font-family:var(--fm);font-size:.65rem;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;padding:6px 2px 5px;border-bottom:1px solid var(--bd);margin-bottom:8px}
+
+/* Program cards */
+.pgrid{display:flex;flex-direction:column;gap:6px}
+.pcard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden}
+.pcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bd2);transition:background .15s}
+.pcard:hover,.pcard.sel{border-color:var(--ac);background:var(--bg3)}
+.pcard:hover::before,.pcard.sel::before{background:var(--ac)}
+.pnum{font-family:var(--fm);font-size:.65rem;color:var(--ac);margin-bottom:2px}
+.pname{font-size:.88rem;font-weight:500;color:var(--t1);line-height:1.3}
+.pmeta{font-size:.68rem;color:var(--t3);margin-top:3px;font-family:var(--fm)}
+.ppct{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--fm);font-size:.7rem;color:var(--t3);transition:color .15s}
+.ppct.dn{color:var(--gr)}
+
+/* Phase groups */
+.phase{margin-bottom:8px}
+.phase-hdr{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);cursor:pointer;transition:border-color .15s}
+.phase-hdr:hover{border-color:var(--ac)}
+.phase-hdr.open{border-radius:var(--rad) var(--rad) 0 0;border-bottom-color:transparent}
+.phase-arr{font-size:.7rem;color:var(--t3);transition:transform .2s;width:14px;text-align:center}
+.phase-arr.open{transform:rotate(90deg)}
+.phase-info{flex:1;min-width:0}
+.phase-name{font-size:.82rem;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phase-meta{font-size:.62rem;color:var(--t3);font-family:var(--fm);margin-top:1px}
+.phase-bar{width:60px;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;flex-shrink:0}
+.phase-fill{height:100%;border-radius:3px;background:var(--gr);transition:width .3s}
+.phase-pct{font-family:var(--fm);font-size:.62rem;color:var(--t3);min-width:28px;text-align:right}
+.phase-body{border:1px solid var(--bd);border-top:none;border-radius:0 0 var(--rad) var(--rad);overflow:hidden;display:none}
+.phase-body.open{display:block}
+.phase.abort .phase-hdr{border-color:var(--bd);opacity:.6}
+.phase.abort .phase-name{font-size:.75rem;color:var(--t3)}
+
+/* Step list */
+.phdr{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:11px 14px;margin-bottom:10px}
+.phdr-n{font-size:.92rem;font-weight:600;color:var(--ac)}
+.phdr-m{font-size:.68rem;color:var(--t3);margin-top:2px;font-family:var(--fm)}
+.slist{display:flex;flex-direction:column;gap:5px}
+.sc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.sc.done{border-color:var(--gr2)}.sc.skip{border-color:#b8960a}.sc.problem{border-color:#b02020}
+.shdr{padding:10px 12px;display:flex;align-items:center;gap:8px}
+.snr{font-family:var(--fm);font-size:.65rem;color:var(--t3);min-width:40px}
+.si{flex:1;min-width:0}
+.sn{font-size:.84rem;font-weight:500;color:var(--t1);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss{display:flex;align-items:center;gap:5px}
+.sdot{width:9px;height:9px;border-radius:50%;background:var(--bd2)}
+.badge{display:inline-block;padding:2px 7px;border-radius:8px;font-size:.62rem;font-family:var(--fm);font-weight:600}
+.bdn{background:var(--grd);color:var(--gr)}.bsk{background:var(--ywd);color:var(--yw)}.bpr{background:var(--rdd);color:var(--rd)}
+
+/* Detail modal */
+#dm{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.72);display:none;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+#dm.open{display:flex}
+.dp{background:var(--bg2);border-radius:18px 18px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:0 0 24px;border-top:1px solid var(--bd2)}
+.dh{width:32px;height:3px;background:var(--bd2);border-radius:2px;margin:10px auto 6px}
+.dhdr{padding:6px 16px 10px;border-bottom:1px solid var(--bd)}
+.dnr{font-family:var(--fm);font-size:.68rem;color:var(--ac);margin-bottom:2px}
+.dname{font-size:1rem;font-weight:600;color:var(--t1)}
+.dblk{font-size:.72rem;color:var(--t3);margin-top:2px}
+
+/* Valve chips */
+.vsec{padding:8px 16px 4px}
+.vgt{font-family:var(--fm);font-size:.62rem;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid var(--bd)}
+.vchips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.vc{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:5px;font-family:var(--fm);font-size:.7rem;border:1px solid transparent}
+.vc.op{background:var(--grd);border-color:rgba(0,232,123,.25);color:var(--gr)}
+.vc.nu{background:var(--acd);border-color:rgba(0,212,255,.2);color:var(--ac)}
+.vc.tg{background:var(--ywd);border-color:rgba(255,204,0,.25);color:var(--yw)}
+.vc.ot{background:var(--pud);border-color:rgba(167,139,250,.25);color:var(--pu)}
+
+/* Action buttons */
+.dacts{padding:12px 16px 4px;display:flex;gap:6px}
+.ab{flex:1;padding:10px 4px;border:none;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:600;font-family:var(--fs);transition:opacity .15s}
+.ab:hover{opacity:.82}
+.adn{background:var(--gr);color:#000}.ask{background:var(--yw);color:#000}.apr{background:var(--rd);color:#fff}
+.dcom{padding:4px 16px}
+.dcom textarea{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:.82rem;padding:9px 11px;resize:none;height:60px;outline:none;font-family:var(--fs)}
+.dcom textarea:focus{border-color:var(--ac)}
+.dbtns{padding:6px 16px;display:flex;gap:6px}
+.bx{flex:1;padding:8px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t2);font-size:.78rem;cursor:pointer;font-family:var(--fm);transition:background .15s;text-align:center}
+.bx:hover{background:var(--bg4)}
+
+/* Timer modal */
+#tm{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#tm.open{display:flex}
+.tmp{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;padding:28px 24px;text-align:center;min-width:240px}
+.tmnm{font-size:.78rem;color:var(--t2);margin-bottom:6px}
+.tmdc{font-family:var(--fm);font-size:2.8rem;font-weight:700;color:var(--ac);letter-spacing:2px;margin-bottom:2px}
+.tmtg{font-size:.72rem;color:var(--t3);margin-bottom:16px}
+.tmbs{display:flex;gap:8px;justify-content:center}
+.tb2{padding:9px 20px;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;font-family:var(--fs)}
+.tb2s{background:var(--gr);color:#000}.tb2e{background:var(--rd);color:#fff}.tb2c{background:var(--bg3);color:var(--t2);border:1px solid var(--bd2)}
+
+/* Search/Picker */
+#sp{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.7);display:none;align-items:flex-end;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+#sp.open{display:flex}
+.spp{background:var(--bg2);border-radius:18px 18px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:0 0 24px;border-top:1px solid var(--bd2)}
+.spsr{position:sticky;top:0;background:var(--bg2);padding:10px 14px;border-bottom:1px solid var(--bd)}
+.spsr input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:.88rem;padding:9px 12px;outline:none;font-family:var(--fs)}
+.spsr input:focus{border-color:var(--ac)}
+.spit{padding:10px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.spit:hover{background:var(--bg3)}
+.spinr{font-family:var(--fm);font-size:.62rem;color:var(--ac)}
+.spin{font-size:.84rem;color:var(--t1)}
+.spib{font-size:.68rem;color:var(--t3)}
+
+/* Analyse / Compare */
+.apick{display:flex;gap:6px;margin-bottom:12px}
+.apb{flex:1;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:9px 10px;cursor:pointer;transition:border-color .15s}
+.apb:hover{border-color:var(--ac)}
+.apl{font-size:.62rem;color:var(--t3);margin-bottom:2px;font-family:var(--fm)}
+.apv{font-size:.82rem;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cgrid{display:flex;gap:6px}
+.ccol{flex:1;min-width:0}
+.chdr{font-family:var(--fm);font-size:.65rem;color:var(--ac);padding:5px 7px;background:var(--bg3);border-radius:5px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv{display:flex;justify-content:space-between;align-items:center;padding:3px 7px;font-family:var(--fm);font-size:.68rem;border-radius:4px;margin-bottom:2px}
+.cv.m{background:var(--grd);color:var(--gr)}.cv.d{background:var(--rdd);color:var(--rd)}.cv.o{background:var(--ywd);color:var(--yw)}
+
+/* Übergabe */
+.uefrm{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:14px;margin-bottom:10px}
+.row{margin-bottom:10px}
+.row label{display:block;font-size:.68rem;color:var(--t3);margin-bottom:4px;font-family:var(--fm);letter-spacing:.5px}
+.row input,.row textarea,.row select{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:7px;color:var(--t1);font-size:.85rem;padding:9px 11px;outline:none;font-family:var(--fs);resize:none}
+.row textarea{height:64px}
+.row input:focus,.row textarea:focus,.row select:focus{border-color:var(--ac)}
+.row select option{background:var(--bg3)}
+.bgen{width:100%;padding:11px;background:var(--ac);color:#000;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--fs);margin-bottom:6px;transition:opacity .15s}
+.bgen:hover{opacity:.85}
+.bexp{width:100%;padding:9px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;font-size:.82rem;color:var(--t2);cursor:pointer;font-family:var(--fm);transition:border-color .15s;margin-bottom:5px}
+.bexp:hover{border-color:var(--ac);color:var(--ac)}
+.rbox{background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--rad);padding:12px;font-family:var(--fm);font-size:.72rem;color:var(--t1);line-height:1.55;white-space:pre-wrap;margin-top:10px}
+
+/* Stats */
+.scard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:12px;margin-bottom:6px}
+.slbl{font-size:.72rem;color:var(--t2);margin-bottom:4px}
+.sval{font-family:var(--fm);font-size:1.4rem;font-weight:700;color:var(--ac)}
+.sbrw{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sblb{font-size:.7rem;color:var(--t2);min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbtr{flex:1;height:7px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.sbfl{height:100%;border-radius:4px}
+
+/* Flow/Schema pane */
+#pane-f{flex-direction:column;overflow:hidden!important;padding:0!important}
+#pane-f.active{display:flex!important}
+.f-hdr{padding:7px 12px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.f-hdr-t{flex:1;font-size:.68rem;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--fm)}
+.f-tools{display:flex;gap:5px;align-items:center}
+.f-tools button{background:var(--bg3);border:1px solid var(--bd2);border-radius:6px;color:var(--t2);font-size:.68rem;padding:4px 9px;cursor:pointer;font-family:var(--fm);transition:all .15s;white-space:nowrap}
+.f-tools button:hover,.f-tools button.active{border-color:var(--ac);color:var(--ac)}
+.f-legend{padding:5px 12px;background:var(--bg3);border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:center;flex-shrink:0;overflow-x:auto}
+.f-legend-item{display:flex;align-items:center;gap:3px;font-family:var(--fm);font-size:.58rem;color:var(--t2);white-space:nowrap}
+.f-legend-dot{width:8px;height:8px;border-radius:50%;border:1px solid rgba(0,0,0,.3);flex-shrink:0}
+#ri-wrap{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;min-height:0;position:relative;background:#e8e7e0}
+#ri-inner{position:relative;display:inline-block;min-width:1400px}
+#ri-img{display:block;width:1400px;height:auto;max-width:none}
+.vlbl{position:absolute;transform:translate(-50%,-50%);z-index:10;cursor:pointer;transition:transform .1s,box-shadow .1s;font-family:var(--fm);white-space:nowrap;border-radius:3px;padding:1px 4px;font-size:8px;font-weight:700;line-height:1.3;text-align:center;border:1px solid rgba(0,0,0,.2);box-shadow:0 1px 3px rgba(0,0,0,.2);user-select:none}
+.vlbl:hover,.vlbl:active{transform:translate(-50%,-50%) scale(1.5);z-index:30;box-shadow:0 3px 12px rgba(0,0,0,.4)}
+.vlbl .vn{display:block;font-size:6px;font-weight:400;opacity:.7;letter-spacing:.2px}
+.vlbl.op{background:#00c853;color:#000;border-color:#009624}
+.vlbl.nu{background:#00b0ff;color:#000;border-color:#0081cb}
+.vlbl.tg{background:#ffd600;color:#000;border-color:#c7a500}
+.vlbl.ot{background:#b388ff;color:#000;border-color:#7c4dff}
+.vlbl.cl{background:rgba(220,220,215,.7);color:#888;border-color:rgba(180,180,175,.5);font-weight:400}
+.vlbl.compact{padding:0;width:10px;height:10px;border-radius:50%;font-size:0;overflow:hidden}
+.vlbl.compact .vn{display:none}
+
+/* Report Archive */
+.rp-tabs{display:flex;gap:0;margin-bottom:10px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--bd)}
+.rp-tab{flex:1;padding:8px 4px;background:var(--bg2);border:none;color:var(--t3);font-size:.75rem;font-family:var(--fs);cursor:pointer;transition:all .15s;text-align:center}
+.rp-tab.active{background:var(--ac);color:#000;font-weight:600}
+.rp-panel{display:none}.rp-panel.active{display:block}
+.rp-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:10px 12px;margin-bottom:6px;position:relative}
+.rp-card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.rp-card-date{font-family:var(--fm);font-size:.65rem;color:var(--ac)}
+.rp-card-by{font-size:.65rem;color:var(--t3);font-family:var(--fm)}
+.rp-card-prog{font-size:.8rem;font-weight:500;color:var(--t1);margin-bottom:3px}
+.rp-card-meta{font-size:.68rem;color:var(--t3);font-family:var(--fm)}
+.rp-card-acts{display:flex;gap:4px;margin-top:6px}
+.rp-btn{padding:5px 10px;border:1px solid var(--bd2);border-radius:6px;background:var(--bg3);color:var(--t2);font-size:.68rem;cursor:pointer;font-family:var(--fm);transition:all .15s}
+.rp-btn:hover{border-color:var(--ac);color:var(--ac)}
+.rp-btn.del:hover{border-color:var(--rd);color:var(--rd)}
+
+/* Error Analysis */
+.ea-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:12px;margin-bottom:6px}
+.ea-title{font-size:.82rem;font-weight:600;color:var(--t1);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ea-badge{display:inline-block;padding:2px 6px;border-radius:5px;font-size:.6rem;font-family:var(--fm);font-weight:700}
+.ea-high{background:var(--rdd);color:var(--rd)}.ea-med{background:var(--ywd);color:var(--yw)}.ea-low{background:var(--grd);color:var(--gr)}
+.ea-desc{font-size:.75rem;color:var(--t2);line-height:1.4;margin-bottom:6px}
+.ea-detail{font-size:.68rem;color:var(--t3);font-family:var(--fm);line-height:1.4}
+.ea-steps{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.ea-step{padding:2px 6px;background:var(--bg3);border:1px solid var(--bd2);border-radius:4px;font-family:var(--fm);font-size:.62rem;color:var(--t2);cursor:pointer;transition:all .15s}
+.ea-step:hover{border-color:var(--ac);color:var(--ac)}
+.ea-empty{text-align:center;padding:20px;color:var(--t3);font-size:.82rem}
+
+/* Changelog */
+.cl-entry{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:8px 10px;margin-bottom:4px}
+.cl-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.cl-nr{font-family:var(--fm);font-size:.62rem;color:var(--ac)}
+.cl-date{font-family:var(--fm);font-size:.6rem;color:var(--t3)}
+.cl-desc{font-size:.78rem;color:var(--t1);line-height:1.35}
+.cl-meta{font-size:.65rem;color:var(--t3);margin-top:2px}
+
+/* Formatwerte / Process Params */
+.fwsec{padding:8px 16px 4px}
+.fwtitle{font-family:var(--fm);font-size:.62rem;color:var(--ac);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid var(--bd)}
+.fwgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+.fwgrid.single{grid-template-columns:1fr}
+.fwcard{background:var(--bg3);border:1px solid var(--bd);border-radius:6px;padding:7px 9px}
+.fwcard.press{border-left:3px solid var(--ac)}
+.fwcard.temp{border-left:3px solid #ff6b35}
+.fwcard.cond{border-left:3px solid var(--yw)}
+.fwcard.time{border-left:3px solid var(--gr)}
+.fwcard.ctrl{border-left:3px solid var(--pu)}
+.fwlbl{font-size:.62rem;color:var(--t2);font-family:var(--fm);line-height:1.3;margin-bottom:3px}
+.fwval{font-family:var(--fm);font-size:.92rem;font-weight:700;color:var(--t1)}
+.fwunit{font-size:.65rem;color:var(--t3);font-weight:400;margin-left:2px}
+.dkm{padding:6px 16px;font-size:.75rem;color:var(--yw);font-family:var(--fm);background:var(--ywd);margin:4px 16px;border-radius:6px;line-height:1.4}
+
+/* AI Agent Chat */
+.ai-hdr{padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--bd);flex-shrink:0}
+.ai-hdr-t{font-family:var(--fm);font-size:.9rem;font-weight:700;color:var(--ac)}
+.ai-hdr-s{font-size:.62rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px}
+.ai-quick{padding:6px 10px;display:flex;gap:4px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid var(--bd);background:var(--bg3)}
+.aiq{padding:5px 10px;background:var(--bg2);border:1px solid var(--bd2);border-radius:14px;color:var(--t2);font-size:.68rem;cursor:pointer;white-space:nowrap;font-family:var(--fs);transition:all .15s}
+.aiq:hover{border-color:var(--ac);color:var(--ac)}
+.ai-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.ai-welcome{text-align:center;padding:20px 10px;margin-top:auto;margin-bottom:auto}
+.ai-wt{font-size:1rem;font-weight:600;color:var(--t1);margin-bottom:6px}
+.ai-ws{font-size:.78rem;color:var(--t3);line-height:1.5;max-width:320px;margin:0 auto}
+.ai-msg{max-width:88%;padding:8px 12px;border-radius:12px;font-size:.82rem;line-height:1.5;word-wrap:break-word}
+.ai-msg.user{background:var(--ac);color:#000;align-self:flex-end;border-bottom-right-radius:4px;font-weight:500}
+.ai-msg.bot{background:var(--bg2);border:1px solid var(--bd);color:var(--t1);align-self:flex-start;border-bottom-left-radius:4px}
+.ai-msg.bot pre{font-family:var(--fm);font-size:.72rem;background:var(--bg3);padding:6px 8px;border-radius:5px;overflow-x:auto;margin:4px 0}
+.ai-msg.bot strong{color:var(--ac);font-weight:700}
+.ai-typing{align-self:flex-start;padding:8px 12px;color:var(--t3);font-size:.78rem;font-family:var(--fm)}
+.ai-typing::after{content:'';animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.ai-input{padding:8px 10px;background:var(--bg2);border-top:1px solid var(--bd);display:flex;gap:6px;align-items:flex-end;flex-shrink:0}
+.ai-input input{flex:1;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;color:var(--t1);font-size:16px;padding:10px 12px;outline:none;font-family:var(--fs);-webkit-appearance:none;appearance:none}
+.ai-input input:focus{border-color:var(--ac)}
+.ai-send{width:36px;height:36px;border-radius:50%;background:var(--ac);border:none;color:#000;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.ai-send:hover{opacity:.85}
+.ai-send:disabled{opacity:.3;cursor:default}
+
+/* Toast */
+#km.open{display:flex}
+#toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:7px 16px;font-size:.8rem;color:var(--t1);z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:32px 16px;color:var(--t3);font-size:.85rem}
+
+/* Search highlight */
+.search-box{position:sticky;top:0;z-index:5;padding:6px 2px;background:var(--bg)}
+.search-box input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:.85rem;padding:8px 12px;outline:none;font-family:var(--fs)}
+.search-box input:focus{border-color:var(--ac)}
+</style>
+</head>
+<body>
+<div id="loading"><div class="ld-logo">◈ AFL</div><div class="ld-sub">54235 · FFV12024 · Roche Kaiseraugst</div><div class="ld-bar"></div></div>
+
+<div id="login">
+  <div class="lg-logo">◈ AFL</div>
+  <div class="lg-brand">Abfüll-Linie · CIP/SIP</div>
+  <div class="lg-sub">Maschine 54235 · FFV12024 · Roche Kaiseraugst</div>
+  <div class="lg-card">
+    <div class="lg-title">Anmeldung</div>
+    <div class="fld"><label>Name / Kürzel</label><input id="iname" type="text" placeholder="z.B. M. Müller" autocomplete="off"></div>
+    <button class="btn-lg" onclick="doLogin()">Starten</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="tb-brand">◈ AFL · 54235 · CIP/SIP</div>
+    <div class="tb-user" id="tu"></div>
+    <button class="btn-out" ontouchend="event.preventDefault();doLogout()" onclick="doLogout()">⏻</button>
+  </div>
+  <div class="content">
+    <!-- Programs -->
+    <div class="pane active" id="pane-p">
+      <div class="search-box"><input id="psearch" type="text" placeholder="Programm suchen…" oninput="rProgs()" autocomplete="off"></div>
+      <div class="sec">Programme · 54235 · Hoffmann-La Roche · AFL</div>
+      <div class="pgrid" id="pgrid"></div>
+    </div>
+    <!-- Steps -->
+    <div class="pane" id="pane-s">
+      <div id="scont"><div class="empty">◈ Programm im Programme-Tab wählen.</div></div>
+    </div>
+    <!-- Analyse -->
+    <div class="pane" id="pane-a">
+      <div class="sec">Ventil-Vergleich</div>
+      <div class="apick">
+        <div class="apb" onclick="openPicker('A')"><div class="apl">SCHRITT A</div><div class="apv" id="pav">— wählen —</div></div>
+        <div class="apb" onclick="openPicker('B')"><div class="apl">SCHRITT B</div><div class="apv" id="pbv">— wählen —</div></div>
+      </div>
+      <div id="cres"></div>
+    </div>
+    <!-- Übergabe -->
+    <div class="pane" id="pane-u">
+      <div class="sec">Übergabe & Analyse</div>
+      <div class="rp-tabs">
+        <button class="rp-tab active" onclick="swRp('new',this)">Neuer Bericht</button>
+        <button class="rp-tab" onclick="swRp('archive',this)">Archiv</button>
+        <button class="rp-tab" onclick="swRp('errors',this)">Fehleranalyse</button>
+        <button class="rp-tab" onclick="swRp('stats',this)">Stats</button>
+      </div>
+      <!-- Neuer Bericht -->
+      <div class="rp-panel active" id="rp-new">
+        <div class="uefrm">
+          <div class="row"><label>Programm</label><select id="uprog"><option value="">— wählen —</option></select></div>
+          <div class="row"><label>Aktueller Schritt</label><input id="ustep" type="text" placeholder="z.B. Schritt 9280"></div>
+          <div class="row"><label>Offene Punkte / Probleme</label><textarea id="uiss" placeholder="z.B. Druckabfall bei V1.2…"></textarea></div>
+          <div class="row"><label>Besondere Vorkommnisse</label><textarea id="unts" placeholder="z.B. Verzögerung wegen…"></textarea></div>
+          <button class="bgen" onclick="genRep()">Bericht generieren & speichern</button>
+          <button class="bexp" onclick="exportSync()">⬆ Sync-Code exportieren</button>
+          <button class="bexp" onclick="importSync()">⬇ Sync-Code importieren</button>
+        </div>
+        <div id="repout"></div>
+      </div>
+      <!-- Archiv -->
+      <div class="rp-panel" id="rp-archive">
+        <div id="archlist"></div>
+      </div>
+      <!-- Fehleranalyse -->
+      <div class="rp-panel" id="rp-errors">
+        <div id="ealist"></div>
+      </div>
+      <!-- Stats -->
+      <div class="rp-panel" id="rp-stats">
+        <div id="stcont"></div>
+        <div class="sec" style="margin-top:12px">Änderungshistorie · V20</div>
+        <div id="clcont" style="margin-bottom:12px"></div>
+      </div>
+    </div>
+    <!-- KI Agent -->
+    <div class="pane" id="pane-st" style="padding:0;display:none;flex-direction:column;overflow:hidden">
+      <div class="ai-hdr">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="ai-hdr-t">🤖 AFL Maintenance Agent</div><div class="ai-hdr-s">54235 · Bausch+Ströbel · Roche KA</div></div>
+        </div>
+      </div>
+      <div class="ai-quick" id="aiquick">
+        <button class="aiq" onclick="aiQ('Was passiert in Schritt 9280?')">Schritt 9280?</button>
+        <button class="aiq" onclick="aiQ('Welche Ventile sind beim Sterilisieren offen?')">Sterilisieren</button>
+        <button class="aiq" onclick="aiQ('Druckabfall bei PT4 — was prüfen?')">Druckabfall PT4</button>
+        <button class="aiq" onclick="aiQ('Erkläre den Unterschied zwischen Prog 5 und 7')">Prog 5 vs 7</button>
+        <button class="aiq" onclick="aiQ('Was bedeutet Taktung X8?')">Taktung X8</button>
+        <button class="aiq" onclick="aiQ('Welche Temperaturen müssen beim SIP erreicht werden?')">SIP Temperaturen</button>
+      </div>
+      <div class="ai-msgs" id="aimsgs"><div class="ai-welcome"><div class="ai-wt">Willkommen beim AFL Maintenance Agent</div><div class="ai-ws">Ich kenne die Maschine 54235 in- und auswendig: alle 240 Ventile, 26 Programme, 455 Schritte, Prozessparameter, Taktfolgen und Sensorik. Frag mich was du wissen willst.</div></div></div>
+      <div class="ai-input"><input id="aiinp" type="text" enterkeyhint="send" inputmode="text" autocomplete="off" placeholder="Frage zur Maschine…" onkeydown="if(event.key==='Enter'){event.preventDefault();aiSend()}"><button class="ai-send" onclick="aiSend()" aria-label="Senden">▶</button></div>
+    </div>
+    <!-- Schema / R&I -->
+    <div class="pane" id="pane-f" style="padding:0">
+      <div class="f-hdr">
+        <div class="f-hdr-t" id="f-lbl">◈ Schritt wählen</div>
+        <div class="f-tools">
+          <button onclick="toggleVLabels()" id="f-lbl-btn" class="active">Labels</button>
+          <button onclick="openFlowPicker()">Schritt</button>
+        </div>
+      </div>
+      <div class="f-legend">
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--gr)"></div>Offen</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--ac)"></div>Getaktet</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--yw)"></div>0/1</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--pu)"></div>Sonst.</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:rgba(74,93,114,.3)"></div>Zu</div>
+        <div class="f-legend-item" style="margin-left:auto;color:var(--ac)"><span id="f-vcnt"></span></div>
+      </div>
+      <div id="ri-wrap"><div id="ri-inner">
+        <img id="ri-img" src="ri.webp" alt="R&I-Fließschema" onload="fRiOk=true;rFlowDots()" onerror="document.getElementById('f-lbl').textContent='⚠ Bild nicht geladen'">
+      </div></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <button class="tab active" onclick="sw('p',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Prog.</button>
+    <button class="tab" onclick="sw('s',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Schritte</button>
+    <button class="tab" onclick="sw('a',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analyse</button>
+    <button class="tab" onclick="sw('u',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Übergabe</button>
+    <button class="tab" onclick="sw('st',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>KI</button>
+    <button class="tab" onclick="sw('f',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="5" height="5" rx="1"/><rect x="2" y="16" width="5" height="5" rx="1"/><rect x="17" y="16" width="5" height="5" rx="1"/><line x1="7" y1="5.5" x2="17" y2="5.5"/><line x1="7" y1="18.5" x2="17" y2="18.5"/><line x1="4.5" y1="8" x2="4.5" y2="16"/><line x1="19.5" y1="8" x2="19.5" y2="16"/></svg>Schema</button>
+  </div>
+</div>
+
+<!-- Detail Sheet -->
+<div id="dm"><div class="dp" id="dpanel">
+  <div class="dh"></div>
+  <div class="dhdr"><div class="dnr" id="dnr"></div><div class="dname" id="dname"></div><div class="dblk" id="dblk"></div></div>
+  <div id="dvalves"></div>
+  <div class="dacts">
+    <button class="ab adn" onclick="setSt('done')">✓ Erledigt</button>
+    <button class="ab ask" onclick="setSt('skip')">↷ Skip</button>
+    <button class="ab apr" onclick="setSt('problem')">⚠ Problem</button>
+  </div>
+  <div class="dcom"><textarea id="dcmt" placeholder="Kommentar…" oninput="saveCmt()"></textarea></div>
+  <div class="dbtns">
+    <button class="bx" onclick="openTm()">⏱ Timer</button>
+    <button class="bx" onclick="goSchema()">◈ Schema</button>
+    <button class="bx" onclick="closeD()">Schließen</button>
+  </div>
+</div></div>
+
+<!-- Timer -->
+<div id="tm"><div class="tmp">
+  <div class="tmnm" id="tmnm"></div>
+  <div class="tmdc" id="tmdc">00:00</div>
+  <div class="tmtg" id="tmtg"></div>
+  <div class="tmbs">
+    <button class="tb2 tb2s" id="tmbtn" onclick="tmToggle()">Start</button>
+    <button class="tb2 tb2c" onclick="closeTm()">Schließen</button>
+  </div>
+</div></div>
+
+<!-- Picker -->
+<div id="sp"><div class="spp">
+  <div class="spsr"><input id="spinp" type="text" placeholder="Schritt suchen…" oninput="fltPk()" autocomplete="off"></div>
+  <div id="splist"></div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+const SK='afl54235v3';
+let ST={},U=null,CP=null,CS=null,tmI=null,tmS=0,tmP=0,tmR=false,pkT='A',cA=null,cB=null;
+
+function ld(){try{ST=JSON.parse(localStorage.getItem(SK)||'{}');}catch(e){ST={};}if(!ST.steps)ST.steps={};if(!ST.reports)ST.reports=[];if(!ST.user)ST.user=null;}
+function sv(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
+
+function doLogin(){
+  const n=document.getElementById('iname').value.trim();
+  if(!n){toast('Bitte Namen eingeben');return;}
+  U={name:n,loginTime:Date.now()};ST.user=U;sv();
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('show');
+  document.getElementById('tu').textContent=n;
+  init();
+}
+function doLogout(){if(!confirm('Abmelden?'))return;U=null;document.getElementById('app').classList.remove('show');document.getElementById('login').style.display='flex';}
+
+function init(){rProgs();bUprog();rStats();}
+
+function sw(n,el){
+  document.querySelectorAll('.pane').forEach(p=>{p.classList.remove('active');p.style.display='';});
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  const pane=document.getElementById('pane-'+n);
+  if(n==='st'){pane.style.display='flex';}else if(n==='f'){pane.classList.add('active');}else{pane.classList.add('active');}
+  el.classList.add('active');
+  if(n==='f')rFlowDots();
+}
+
+// Valve group display order
+const GO=['Medienventile','Sicherheits Ventile','Stellenvereinzelungsventile','Ventile im Bereich Füllstation','Ventile im Bereich Nachbegasen','Ventile im Bereich Schließbegasen','Ventile im Bereich Medieneinheit / Wärmetauscher','Ventile','Ventile im Bereich Produktfilter','Ventile im Bereich Sterilfiltereinheit für Be.- und Entlüftung Dosierbehälter','Ventile im Bereich Sterilfiltereinheit  für die Begasungsstationen','Ventile für Nadelventil / Filtertest / Dampfkühlung','Ventile im Bereich Ablauf'];
+
+function vcls(c){if(!c)return'ot';const u=String(c).toUpperCase().trim();if(u==='X')return'op';if(u==='0'||u==='1'||u==='0/1'||u==='1/0')return'tg';if(u.startsWith('X')&&u.length>1)return'nu';return'op';}
+
+function rProgs(){
+  const g=document.getElementById('pgrid');g.innerHTML='';
+  const q=(document.getElementById('psearch')?.value||'').toLowerCase();
+  for(const[pid,p]of Object.entries(VSP.progs)){
+    if(q&&!p.name.toLowerCase().includes(q))continue;
+    const s=p.steps,dn=s.filter(x=>ST.steps[x]?.status==='done').length,pr=s.filter(x=>ST.steps[x]?.status==='problem').length,pct=s.length?Math.round(dn/s.length*100):0;
+    const d=document.createElement('div');d.className='pcard'+(CP===pid?' sel':'');
+    d.innerHTML=`<div class="pnum">${pid}</div><div class="pname">${p.name}</div><div class="pmeta">${s.length} Schritte${pr?` · <span style="color:var(--rd)">${pr} ⚠</span>`:''}</div><div class="ppct ${pct===100?'dn':''}">${pct}%</div>`;
+    d.onclick=()=>selP(pid);g.appendChild(d);
+  }
+}
+function selP(pid){CP=pid;rProgs();rSteps();sw('s',document.querySelectorAll('.tab')[1]);}
+
+function rSteps(){
+  const c=document.getElementById('scont');
+  if(!CP||!VSP.progs[CP]){c.innerHTML='<div class="empty">◈ Kein Programm gewählt.</div>';return;}
+  const p=VSP.progs[CP],allSteps=p.steps;
+  const totalDn=allSteps.filter(x=>ST.steps[x]?.status==='done').length;
+  const totalPr=allSteps.filter(x=>ST.steps[x]?.status==='problem').length;
+  const totalPct=allSteps.length?Math.round(totalDn/allSteps.length*100):0;
+
+  // Group steps by phase/block
+  const phaseSteps={};const phaseOrder=[];
+  for(const seq of allSteps){
+    const block=VSP.sb?.[String(seq)]||VSP.s[String(seq)]?.b||'Sonstige';
+    if(!phaseSteps[block]){phaseSteps[block]=[];phaseOrder.push(block);}
+    phaseSteps[block].push(seq);
+  }
+
+  let h=`<div class="phdr"><div class="phdr-n">${p.name}</div><div class="phdr-m">${allSteps.length} Schritte · ${totalDn} erledigt · ${totalPct}%${totalPr?` · <span style="color:var(--rd)">${totalPr} ⚠</span>`:''}</div><div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${totalPct}%;background:${totalPct===100?'var(--gr)':'var(--ac)'};border-radius:2px;transition:width .3s"></div></div></div>`;
+
+  for(const block of phaseOrder){
+    const steps=phaseSteps[block];
+    const dn=steps.filter(x=>ST.steps[x]?.status==='done').length;
+    const pr=steps.filter(x=>ST.steps[x]?.status==='problem').length;
+    const pct=steps.length?Math.round(dn/steps.length*100):0;
+    const isAbort=block==='Ventilstellungen nach Abbruch';
+    const isInit=block==='Anwahl Programm';
+    const isEnd=block==='CIP-SIP beenden';
+    const pid=`ph_${block.replace(/\W/g,'_')}`;
+
+    h+=`<div class="phase ${isAbort?'abort':''}">`;
+    h+=`<div class="phase-hdr${!isAbort?' open':''}" onclick="togglePhase('${pid}')">`;
+    h+=`<div class="phase-arr${!isAbort?' open':''}" id="arr_${pid}">▶</div>`;
+    h+=`<div class="phase-info"><div class="phase-name">${block}</div>`;
+    h+=`<div class="phase-meta">${steps.length} Schritte${pr?` · <span style="color:var(--rd)">${pr}⚠</span>`:''}</div></div>`;
+    h+=`<div class="phase-bar"><div class="phase-fill" style="width:${pct}%;${pct===100?'background:var(--gr)':''}"></div></div>`;
+    h+=`<div class="phase-pct">${pct}%</div>`;
+    h+=`</div>`;
+    h+=`<div class="phase-body${!isAbort?' open':''}" id="${pid}">`;
+
+    for(const seq of steps){
+      const st=VSP.s[String(seq)];if(!st)continue;
+      const ss=ST.steps[seq]||{},status=ss.status||'';
+      const vc=st.o.length;
+      const zeit=st.fw?.FW1;
+      let zeitStr='';
+      if(zeit&&zeit!=='0'){const zv=parseFloat(zeit);const zm=Math.floor(zv/100),zs=zv%100;zeitStr=zm>0?`${zm}:${String(Math.round(zs)).padStart(2,'0')}`:`${Math.round(zs)}s`;}
+      h+=`<div class="sc ${status}" onclick="openD(${seq})"><div class="shdr"><div class="snr">${seq}</div><div class="si"><div class="sn">${st.n||'—'}</div>${zeitStr?`<div style="font-size:.62rem;color:var(--yw);font-family:var(--fm)">⏱ ${zeitStr}</div>`:''}</div><div class="ss">${vc?`<span style="font-family:var(--fm);font-size:.6rem;color:var(--t3)">${vc}V</span>`:''} ${status==='done'?'<span class="badge bdn">✓</span>':status==='skip'?'<span class="badge bsk">↷</span>':status==='problem'?'<span class="badge bpr">⚠</span>':'<div class="sdot"></div>'}</div></div></div>`;
+    }
+    h+=`</div></div>`;
+  }
+  c.innerHTML=h;
+}
+function togglePhase(pid){
+  const body=document.getElementById(pid);
+  const arr=document.getElementById('arr_'+pid);
+  if(!body)return;
+  const open=body.classList.toggle('open');
+  body.previousElementSibling?.classList.toggle('open',open);
+  if(arr)arr.classList.toggle('open',open);
+}
+
+function fmtFW(id,val){
+  const v=parseFloat(String(val).replace(',','.'));
+  if(isNaN(v))return val;
+  if(id==='FW1'){const m=Math.floor(v/100),s2=v%100;return m>0?`${m}:${String(Math.round(s2)).padStart(2,'0')} min`:`${Math.round(s2)} sek`;}
+  const cfg=VSP.fwc?.[id];
+  if(cfg){const rv=v*cfg.m;const u=cfg.u.trim();if(u==='bar')return rv.toFixed(2)+' bar';if(u==='°C')return rv.toFixed(0)+'°C';if(u==='uS')return rv.toFixed(2)+' µS/cm';if(u==='%')return rv.toFixed(0)+' %';return rv+' '+u;}
+  return val;
+}
+function fwType(id){
+  if(id==='FW1')return'time';
+  if(id.match(/FW[2-6]/)||id.match(/FW(18|19|20)/))return'press';
+  if(id.match(/FW(7|8|9|10|11|12|13|14|15|16|21|22)/))return'temp';
+  if(id==='FW17')return'cond';
+  return'ctrl';
+}
+function fwShort(id){
+  if(VSP.fwl?.[id])return VSP.fwl[id];
+  if(id==='FW1')return'Schrittzeit';
+  return id;
+}
+function openD(seq){
+  CS=seq;const s=VSP.s[String(seq)];if(!s)return;
+  const ss=ST.steps[seq]||{};
+  document.getElementById('dnr').textContent=`Schritt ${seq}`;
+  document.getElementById('dname').textContent=s.n||'—';
+  document.getElementById('dblk').textContent=s.b||'';
+  document.getElementById('dcmt').value=ss.comment||'';
+
+  let html='';
+
+  // Kommentar from Excel
+  if(s.km)html+=`<div class="dkm">💡 ${s.km}</div>`;
+
+  // Formatwerte (process parameters)
+  if(s.fw){
+    const entries=Object.entries(s.fw).filter(([k,v])=>v!=='0'&&!k.match(/FW2[3-9]|FW3[0-2]/));
+    if(entries.length>0){
+      // Sort: time first, then pressure, temp, conductivity, ctrl
+      const order={time:0,press:1,temp:2,cond:3,ctrl:4};
+      entries.sort((a,b)=>(order[fwType(a[0])]||5)-(order[fwType(b[0])]||5));
+      // Schrittzeit as full-width header card
+      const zeitEntry=entries.find(([k])=>k==='FW1');
+      const rest=entries.filter(([k])=>k!=='FW1');
+      html+=`<div class="fwsec"><div class="fwtitle">Prozessparameter</div>`;
+      if(zeitEntry){
+        html+=`<div class="fwgrid single"><div class="fwcard time"><div class="fwlbl">⏱ ${fwShort('FW1')}</div><div class="fwval" style="font-size:1.1rem">${fmtFW('FW1',zeitEntry[1])}</div></div></div>`;
+      }
+      if(rest.length>0){
+        html+=`<div class="fwgrid">`;
+        for(const[fid,fval]of rest){
+          const tp=fwType(fid);
+          const icon=tp==='press'?'◉':tp==='temp'?'🌡':tp==='cond'?'⚡':'⚙';
+          const valColor=tp==='temp'?'color:#ff6b35':tp==='press'?'color:var(--ac)':tp==='cond'?'color:var(--yw)':'';
+          html+=`<div class="fwcard ${tp}"><div class="fwlbl">${icon} ${fwShort(fid)}</div><div class="fwval" style="${valColor}">${fmtFW(fid,fval)}</div></div>`;
+        }
+        html+=`</div>`;
+      }
+      html+=`</div>`;
+    }
+  }
+
+  // Taktung legend if step has non-X codes
+  const usedCodes=new Set(s.o.map(([v,c])=>c).filter(c=>c!=='X'&&c!=='x'));
+  if(usedCodes.size>0){
+    html+=`<div class="fwsec"><div class="fwtitle">Ventiltaktungen in diesem Schritt</div><div style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px">`;
+    for(const code of [...usedCodes].sort()){
+      const td=VSP.td?.[code]||'';
+      if(!td)continue;
+      const cls=vcls(code);
+      html+=`<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><span class="vc ${cls}" style="min-width:fit-content;margin:0">${code}</span><span style="font-size:.72rem;color:var(--t2)">${td}</span></div>`;
+    }
+    html+=`</div></div>`;
+  }
+
+  // Group valves
+  const grp={};
+  for(const[v,c]of s.o){const g=VSP.vi[v]?.g||'Sonstige';if(!grp[g])grp[g]=[];grp[g].push([v,c]);}
+  const og=[...GO.filter(g=>grp[g]),...Object.keys(grp).filter(g=>!GO.includes(g))];
+  for(const g of og){if(!grp[g])continue;html+=`<div class="vsec"><div class="vgt">${g} (${grp[g].length})</div><div class="vchips">`;for(const[v,c]of grp[g]){const sps=VSP.vi[v]?.a?` [${VSP.vi[v].a}]`:'';const td=VSP.td?.[c]||'';const desc=VSP.vi[v]?.d||'';html+=`<div class="vc ${vcls(c)}" onclick="toast('${v}: ${c} → ${td.replace(/'/g,"\\'")}${sps}')" title="${desc}"><span>${v}</span> <span style="font-size:.6rem;opacity:.75">${c}</span>${td&&c!=='X'&&c!=='x'?`<span style="font-size:.55rem;opacity:.6;margin-left:2px">${td.length>25?td.slice(0,23)+'…':td}</span>`:''}</div>`;}html+='</div></div>';}
+  if(!s.o.length&&!s.fw)html+='<div style="padding:12px 16px;color:var(--t3);font-size:.8rem">Keine Daten für diesen Schritt.</div>';
+  document.getElementById('dvalves').innerHTML=html;
+  document.getElementById('dm').classList.add('open');
+  document.getElementById('dpanel').scrollTop=0;
+}
+function closeD(){document.getElementById('dm').classList.remove('open');}
+function goSchema(){closeD();sw('f',document.querySelectorAll('.tab')[5]);}
+function setSt(st){if(!CS)return;if(!ST.steps[CS])ST.steps[CS]={};ST.steps[CS].status=st;ST.steps[CS].statusTime=Date.now();ST.steps[CS].statusUser=U?.name||'';sv();rSteps();closeD();toast(st==='done'?'✓ Erledigt':st==='skip'?'↷ Übersprungen':'⚠ Problem');}
+function saveCmt(){if(!CS)return;if(!ST.steps[CS])ST.steps[CS]={};ST.steps[CS].comment=document.getElementById('dcmt').value;sv();}
+
+// Timer
+function openTm(){if(!CS)return;const s=VSP.s[String(CS)];document.getElementById('tmnm').textContent=s?.n||'';document.getElementById('tmtg').textContent='';tmR=false;tmS=0;tmP=0;document.getElementById('tmdc').textContent='00:00';document.getElementById('tmbtn').textContent='Start';document.getElementById('tmbtn').className='tb2 tb2s';document.getElementById('tm').classList.add('open');}
+function tmToggle(){if(!tmR){tmR=true;tmS=Date.now()-tmP;tmI=setInterval(()=>{const e=Math.floor((Date.now()-tmS)/1000);document.getElementById('tmdc').textContent=String(Math.floor(e/60)).padStart(2,'0')+':'+String(e%60).padStart(2,'0');},500);document.getElementById('tmbtn').textContent='Stopp';document.getElementById('tmbtn').className='tb2 tb2e';}else{tmR=false;tmP=Date.now()-tmS;clearInterval(tmI);document.getElementById('tmbtn').textContent='Weiter';document.getElementById('tmbtn').className='tb2 tb2s';}}
+function closeTm(){clearInterval(tmI);tmR=false;document.getElementById('tm').classList.remove('open');}
+
+// Picker
+function openPicker(t){pkT=t;document.getElementById('spinp').value='';bkPl('');document.getElementById('sp').classList.add('open');document.getElementById('spinp').focus();}
+function bkPl(q){const l=document.getElementById('splist');const qq=q.toLowerCase();let h='';let ct=0;for(const[seq,s]of Object.entries(VSP.s)){if(ct>100)break;if(qq&&!s.n.toLowerCase().includes(qq)&&!s.b.toLowerCase().includes(qq)&&!seq.includes(qq))continue;ct++;h+=`<div class="spit" onclick="pkSt('${seq}')"><div class="spinr">${seq}</div><div class="spin">${s.n||'—'}</div><div class="spib">${s.b}</div></div>`;}l.innerHTML=h||'<div style="padding:16px;color:var(--t3);text-align:center">Keine Treffer</div>';}
+function fltPk(){bkPl(document.getElementById('spinp').value);}
+function pkSt(seq){document.getElementById('sp').classList.remove('open');const s=VSP.s[seq];if(!s)return;if(pkT==='A'){cA=seq;document.getElementById('pav').textContent=`${seq}: ${s.n}`;}else if(pkT==='B'){cB=seq;document.getElementById('pbv').textContent=`${seq}: ${s.n}`;}else if(pkT==='F'){CS=parseInt(seq);rFlowDots();return;}if(cA&&cB)rCmp();}
+
+// Compare
+function rCmp(){const sA=VSP.s[cA],sB=VSP.s[cB];if(!sA||!sB)return;const mA=Object.fromEntries(sA.o),mB=Object.fromEntries(sB.o);const av=[...new Set([...Object.keys(mA),...Object.keys(mB)])].sort();let ca='',cb='',sm=0,df=0,oA=0,oB=0;for(const v of av){const a=mA[v],b=mB[v];if(a&&b){const c=a===b?'m':'d';if(a===b)sm++;else df++;ca+=`<div class="cv ${c}"><span>${v}</span><span>${a}</span></div>`;cb+=`<div class="cv ${c}"><span>${v}</span><span>${b}</span></div>`;}else if(a){oA++;ca+=`<div class="cv o"><span>${v}</span><span>${a}</span></div>`;cb+=`<div class="cv" style="opacity:.15"><span>${v}</span><span>—</span></div>`;}else{oB++;ca+=`<div class="cv" style="opacity:.15"><span>${v}</span><span>—</span></div>`;cb+=`<div class="cv o"><span>${v}</span><span>${b}</span></div>`;}}document.getElementById('cres').innerHTML=`<div style="font-size:.68rem;color:var(--t3);margin-bottom:6px;font-family:var(--fm)">✓ ${sm} gleich · ≠ ${df} verschieden · ◄ ${oA} nur A · ► ${oB} nur B</div><div class="cgrid"><div class="ccol"><div class="chdr">A · ${sA.n}</div>${ca}</div><div class="ccol"><div class="chdr">B · ${sB.n}</div>${cb}</div></div>`;}
+
+// Übergabe
+function swRp(id,el){document.querySelectorAll('.rp-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.rp-tab').forEach(t=>t.classList.remove('active'));document.getElementById('rp-'+id).classList.add('active');el.classList.add('active');if(id==='archive')rArchive();if(id==='errors')rErrors();if(id==='stats'){rStats();rChangelog();}}
+function bUprog(){const s=document.getElementById('uprog');s.innerHTML='<option value="">— wählen —</option>';for(const[pid,p]of Object.entries(VSP.progs)){const o=document.createElement('option');o.value=pid;o.textContent=`${pid}: ${p.name}`;s.appendChild(o);}}
+function genRep(){
+  const pid=document.getElementById('uprog').value,step=document.getElementById('ustep').value.trim(),iss=document.getElementById('uiss').value.trim(),nts=document.getElementById('unts').value.trim();
+  const now=new Date(),ts=now.toLocaleString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const p=pid?VSP.progs[pid]:null,ps=p?p.steps:[],dn=ps.filter(s=>ST.steps[s]?.status==='done').length,pr=ps.filter(s=>ST.steps[s]?.status==='problem').length,sk=ps.filter(s=>ST.steps[s]?.status==='skip').length;
+  const prs=ps.filter(s=>ST.steps[s]?.status==='problem').map(s=>{const x=VSP.s[String(s)];const c=ST.steps[s]?.comment||'';return`  · Schritt ${s}: ${x?.n||'?'}${c?' → '+c:''}`;});
+  let r=`══════════════════════════════════════════\n  SCHICHTÜBERGABE · AFL CIP/SIP\n  Maschine 54235 · FFV12024 · Roche KA\n══════════════════════════════════════════\n\nDatum/Zeit : ${ts}\nVon        : ${U?.name||'?'}\n${p?'Programm   : '+p.name:''}\n${step?'Akt. Schritt: '+step:''}\n\n─── FORTSCHRITT ───\n${p?`Gesamt: ${ps.length} · Erledigt: ${dn} · Skip: ${sk} · Probleme: ${pr}`:'Kein Programm'}${prs.length?'\n\n─── PROBLEME ───\n'+prs.join('\n'):''}${iss?'\n\n─── OFFENE PUNKTE ───\n'+iss:''}${nts?'\n\n─── VORKOMMNISSE ───\n'+nts:''}\n\n──────────────────────────────────────────\n◈ AFL 54235 · ${ts}`;
+  // Save to archive
+  if(!ST.reports)ST.reports=[];
+  ST.reports.push({id:Date.now(),ts:ts,user:U?.name||'?',prog:p?.name||'—',pid:pid,step:step,issues:iss,notes:nts,done:dn,total:ps.length,problems:pr,skipped:sk,text:r,problemSteps:ps.filter(s=>ST.steps[s]?.status==='problem')});
+  sv();
+  document.getElementById('repout').innerHTML=`<div class="rbox">${r.replace(/</g,'&lt;')}</div><button class="bexp" style="margin-top:6px" onclick="if(window._r)navigator.clipboard?.writeText(window._r).then(()=>toast('Kopiert!'))">Kopieren</button>`;
+  window._r=r;toast('✓ Bericht gespeichert');
+}
+function rArchive(){
+  const c=document.getElementById('archlist');
+  if(!ST.reports||!ST.reports.length){c.innerHTML='<div class="ea-empty">Noch keine Berichte gespeichert.</div>';return;}
+  let h='';
+  for(const rep of [...ST.reports].reverse()){
+    const pct=rep.total?Math.round(rep.done/rep.total*100):0;
+    h+=`<div class="rp-card"><div class="rp-card-hdr"><div class="rp-card-date">${rep.ts}</div><div class="rp-card-by">${rep.user}</div></div>`;
+    h+=`<div class="rp-card-prog">${rep.prog}</div>`;
+    h+=`<div class="rp-card-meta">${rep.done}/${rep.total} erledigt (${pct}%)${rep.problems?' · <span style="color:var(--rd)">'+rep.problems+' Probleme</span>':''}${rep.step?' · Schritt '+rep.step:''}</div>`;
+    h+=`<div class="rp-card-acts"><button class="rp-btn" onclick="viewRep(${rep.id})">Anzeigen</button><button class="rp-btn" onclick="copyRep(${rep.id})">Kopieren</button><button class="rp-btn del" onclick="delRep(${rep.id})">Löschen</button></div></div>`;
+  }
+  c.innerHTML=h;
+}
+function viewRep(id){const rep=ST.reports?.find(r=>r.id===id);if(!rep)return;document.getElementById('repout').innerHTML=`<div class="rbox">${rep.text.replace(/</g,'&lt;')}</div>`;window._r=rep.text;swRp('new',document.querySelectorAll('.rp-tab')[0]);toast('Bericht geladen');}
+function copyRep(id){const rep=ST.reports?.find(r=>r.id===id);if(!rep)return;navigator.clipboard?.writeText(rep.text).then(()=>toast('Kopiert!'));}
+function delRep(id){if(!confirm('Bericht endgültig löschen?'))return;ST.reports=ST.reports.filter(r=>r.id!==id);sv();rArchive();toast('Gelöscht');}
+
+// Fehleranalyse
+function rErrors(){
+  const c=document.getElementById('ealist');
+  // Collect all problem steps with their data
+  const problems=[];
+  for(const[seq,sd]of Object.entries(ST.steps)){
+    if(sd.status!=='problem')continue;
+    const s=VSP.s[seq];if(!s)continue;
+    problems.push({seq:parseInt(seq),name:s.n,block:s.b,comment:sd.comment||'',time:sd.statusTime||0,user:sd.statusUser||'',valves:s.o,fw:s.fw});
+  }
+  if(!problems.length){c.innerHTML='<div class="ea-empty">✓ Keine Probleme gemeldet. Alles läuft.</div>';return;}
+  // Analyze patterns
+  let h='<div style="margin-bottom:10px">';
+  // 1. Summary
+  h+=`<div class="ea-card"><div class="ea-title">📊 Übersicht <span class="ea-badge ea-high">${problems.length} Probleme</span></div>`;
+  // Group by block/phase
+  const byBlock={};for(const p of problems){byBlock[p.block]=(byBlock[p.block]||[]);byBlock[p.block].push(p);}
+  for(const[block,probs]of Object.entries(byBlock).sort((a,b)=>b[1].length-a[1].length)){
+    h+=`<div style="margin-bottom:4px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.75rem;color:var(--t1)">${block}</span><span class="ea-badge ${probs.length>=3?'ea-high':probs.length>=2?'ea-med':'ea-low'}">${probs.length}×</span></div>`;
+    h+=`<div class="ea-steps">`;for(const p of probs)h+=`<div class="ea-step" onclick="openD(${p.seq})">${p.seq}: ${p.name.slice(0,25)}</div>`;
+    h+=`</div></div>`;
+  }
+  h+=`</div>`;
+  // 2. Valve frequency analysis - which valves appear most in problem steps
+  const valveFreq={};
+  for(const p of problems){for(const[v,state]of p.valves){valveFreq[v]=(valveFreq[v]||0)+1;}}
+  const topValves=Object.entries(valveFreq).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(topValves.length>0){
+    h+=`<div class="ea-card"><div class="ea-title">🔧 Ventil-Häufigkeit in Problemschritten</div><div class="ea-desc">Diese Ventile tauchen am häufigsten in den Schritten auf, die als problematisch markiert wurden.</div>`;
+    const mx=topValves[0][1];
+    for(const[v,cnt]of topValves){
+      const info=VSP.vi[v];
+      h+=`<div class="sbrw"><div class="sblb" title="${info?.d||''}">${v} ${info?.d?.slice(0,20)||''}</div><div class="sbtr"><div class="sbfl" style="width:${Math.round(cnt/mx*100)}%;background:var(--rd)"></div></div><div style="font-family:var(--fm);font-size:.68rem;color:var(--t3);min-width:20px;text-align:right">${cnt}×</div></div>`;
+    }
+    h+=`</div>`;
+  }
+  // 3. Parameter analysis - check if problem steps share common pressure/temp thresholds
+  const fwIssues={};
+  for(const p of problems){
+    if(!p.fw)continue;
+    for(const[fid,fval]of Object.entries(p.fw)){
+      if(fval==='0')continue;
+      if(!fwIssues[fid])fwIssues[fid]={vals:[],steps:[]};
+      fwIssues[fid].vals.push(parseFloat(fval));
+      fwIssues[fid].steps.push(p.seq);
+    }
+  }
+  const critFW=Object.entries(fwIssues).filter(([k,v])=>v.steps.length>=2).sort((a,b)=>b[1].steps.length-a[1].steps.length);
+  if(critFW.length>0){
+    h+=`<div class="ea-card"><div class="ea-title">🌡 Kritische Prozessparameter</div><div class="ea-desc">Parameter die in mehreren Problemschritten vorkommen — mögliche Ursache für wiederkehrende Probleme.</div>`;
+    for(const[fid,data]of critFW.slice(0,6)){
+      const label=VSP.fwl?.[fid]||fid;
+      const vals=[...new Set(data.vals.map(v=>fmtFW(fid,v)))].join(', ');
+      h+=`<div style="margin-bottom:4px;padding:4px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;justify-content:space-between"><span style="font-size:.72rem;color:var(--t1)">${label}</span><span class="ea-badge ea-med">${data.steps.length}× betroffen</span></div><div style="font-size:.65rem;color:var(--t3);font-family:var(--fm)">Werte: ${vals}</div><div class="ea-steps">${data.steps.map(s=>`<div class="ea-step" onclick="openD(${s})">${s}</div>`).join('')}</div></div>`;
+    }
+    h+=`</div>`;
+  }
+  // 4. Individual problem details with comments
+  h+=`<div class="ea-card"><div class="ea-title">📝 Alle Probleme im Detail</div>`;
+  for(const p of problems.sort((a,b)=>b.time-a.time)){
+    const timeStr=p.time?new Date(p.time).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    h+=`<div style="padding:6px 0;border-bottom:1px solid var(--bd);cursor:pointer" onclick="openD(${p.seq})">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.78rem;font-weight:500;color:var(--t1)">${p.seq}: ${p.name}</span><span style="font-size:.6rem;color:var(--t3);font-family:var(--fm)">${timeStr}</span></div>`;
+    h+=`<div style="font-size:.68rem;color:var(--t3)">${p.block}${p.user?' · '+p.user:''}</div>`;
+    if(p.comment)h+=`<div style="font-size:.72rem;color:var(--yw);margin-top:2px">💬 ${p.comment}</div>`;
+    h+=`</div>`;
+  }
+  h+=`</div></div>`;
+  c.innerHTML=h;
+}// end rErrors
+function exportSync(){const d={v:3,steps:ST.steps,reports:ST.reports||[],ts:Date.now(),user:U?.name||''};const code=btoa(unescape(encodeURIComponent(JSON.stringify(d))));navigator.clipboard?.writeText(code).then(()=>toast('Sync-Code kopiert!')).catch(()=>prompt('Sync-Code:',code));}
+function importSync(){const c=prompt('Sync-Code einfügen:');if(!c)return;try{const d=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));if(d.steps){ST.steps={...ST.steps,...d.steps};}if(d.reports){if(!ST.reports)ST.reports=[];const ids=new Set(ST.reports.map(r=>r.id));for(const r of d.reports){if(!ids.has(r.id))ST.reports.push(r);}}sv();rSteps();rStats();toast('✓ Sync OK');}catch(e){toast('Ungültiger Code');}}
+
+// Stats
+function rStats(){const c=document.getElementById('stcont');const all=Object.values(ST.steps);const td=all.filter(s=>s.status==='done').length,tp=all.filter(s=>s.status==='problem').length,ts2=all.filter(s=>s.status==='skip').length;const pb={};for(const[seq,s]of Object.entries(ST.steps)){if(s.status!=='problem')continue;for(const[pid,p]of Object.entries(VSP.progs)){if(p.steps.includes(parseInt(seq))){pb[pid]=(pb[pid]||0)+1;break;}}}const mx=Math.max(1,...Object.values(pb));let pr='';for(const[pid,cnt]of Object.entries(pb).sort((a,b)=>b[1]-a[1]).slice(0,8)){const p=VSP.progs[pid];if(!p)continue;pr+=`<div class="sbrw"><div class="sblb" title="${p.name}">${p.name}</div><div class="sbtr"><div class="sbfl" style="width:${Math.round(cnt/mx*100)}%;background:var(--rd)"></div></div><div style="font-family:var(--fm);font-size:.68rem;color:var(--t3);min-width:20px;text-align:right">${cnt}</div></div>`;}c.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"><div class="scard"><div class="slbl">Erledigt</div><div class="sval" style="color:var(--gr)">${td}</div></div><div class="scard"><div class="slbl">Probleme</div><div class="sval" style="color:var(--rd)">${tp}</div></div><div class="scard"><div class="slbl">Übersprungen</div><div class="sval" style="color:var(--yw)">${ts2}</div></div><div class="scard"><div class="slbl">Gesamtschritte</div><div class="sval">${Object.keys(VSP.s).length}</div></div></div>${pr?`<div class="scard"><div class="slbl" style="margin-bottom:8px">Probleme nach Programm</div>${pr}</div>`:'<div class="empty">✓ Keine Probleme gemeldet.</div>'}`;}
+
+function rChangelog(){
+  const c=document.getElementById('clcont');if(!c||!VSP.cl)return;
+  let h='';
+  const entries=[...VSP.cl].reverse();
+  for(const e of entries.slice(0,30)){
+    h+=`<div class="cl-entry"><div class="cl-hdr"><div class="cl-nr">${e.v||''} ${e.nr?'#'+e.nr:''}</div><div class="cl-date">${e.dt||''} ${e.by||''}</div></div><div class="cl-desc">${e.d||'—'}</div>${e.b||e.a?`<div class="cl-meta">${e.b||''} ${e.a?'· '+e.a:''}</div>`:''}</div>`;
+  }
+  c.innerHTML=h||'<div class="empty">Keine Änderungen.</div>';
+}
+
+// Flow / R&I Schema
+const VP={"V5.1":[14.42,37.35],"V5.2":[20.34,37.37],"V5.4":[23.35,38.43],"V5.3":[25.87,37.36],"V5.13":[25.36,35.91],"V5.5":[22.89,39.18],"V3.24":[11.4,44.94],"V3.21":[13.52,47.46],"V3.18":[15.85,44.97],"V3.9":[22.52,47.46],"V3.12":[20.4,44.96],"V3.14":[18.83,44.95],"V3.23":[12.06,47.46],"V3.20":[14.35,44.97],"V3.17":[16.59,47.46],"V3.8":[23.34,44.96],"V3.11":[21.04,47.46],"V3.15":[18.07,47.49],"V3.22":[12.87,44.97],"V3.19":[15.11,47.46],"V3.16":[17.36,44.96],"V3.7":[24.07,47.46],"V3.10":[21.89,44.96],"V3.13":[19.56,47.45],"V3.3":[27.02,47.45],"V3.2":[27.8,44.95],"V3.4":[26.32,44.95],"V3.1":[28.53,47.49],"V3.5":[25.56,47.49],"V3.6":[24.84,44.94],"V5.6":[10.67,43.32],"V4.1":[10.07,69.85],"V8.4":[63.81,14.23],"V8.1":[59.85,9.28],"V8.9":[58.23,20.27],"V12.16":[80.92,48.05],"V13.3":[83.37,47.08],"V12.14":[82.72,47.32],"V7.1":[41.41,76.91],"V14.6":[79.63,77.44],"V14.4":[77.16,77.11],"V14.3":[74.14,76.95],"V5.14":[83.98,80.23],"V14.12":[85.1,80.92],"V14.13":[84.2,80.92],"V12.6":[83.18,44.37],"V7.2":[42.48,76.9],"V14.5":[72.07,76.89],"V14.10":[85.37,80.16],"V5.12":[75.17,76.94],"V14.8":[81.15,80.17],"V14.7":[82.13,80.16],"V14.9":[83.06,80.37],"V6.2":[34.22,72.52],"V5.7":[11.69,73.8],"V6.1":[33.73,74.07],"V6.3":[35.37,74.04],"V5.11":[37.85,76.95],"V6.7":[36.26,74.04],"V14.1":[76.03,76.96],"V6.5":[55.02,73.37],"V5.9":[38.74,76.89],"V4.7":[9.64,75.29],"V4.8":[10.72,76.9],"V4.13":[14.2,76.9],"V4.14":[15.13,76.91],"V14.11":[16.29,76.95],"V7.6":[18.39,76.91],"V7.5":[19.27,76.91],"V6.8":[20.47,76.9],"V12.9":[78.64,46.15],"V12.3":[83.9,43.7],"V12.1":[84.68,39.26],"V13.6":[88.66,83.39],"V14.15":[86.21,84.01],"V14.14":[87.0,84.0],"V13.5":[88.13,83.66],"V14.2":[79.64,75.76],"V10.9":[60.13,45.21],"V11.14":[63.91,47.2],"V11.12":[65.71,46.53],"V11.15":[66.41,46.29],"V11.2":[66.59,43.08],"V11.6":[66.1,43.94],"V11.9":[66.39,44.42],"V11.5":[63.91,43.13],"V10.1":[58.55,43.94],"V12.10":[79.2,46.38],"V10.8":[59.85,44.65],"V10.3":[61.87,44.82],"V11.16":[64.79,47.03],"V11.11":[67.06,46.27],"V12.2":[84.96,39.93],"V13.4":[81.76,47.8],"V11.4":[67.06,43.14],"V10.2":[61.94,41.83],"V10.4":[61.37,41.82],"V10.6":[59.48,44.01],"V10.7":[61.26,43.95],"V11.13":[64.39,46.33],"V12.12":[84.06,47.09],"V12.8":[83.41,45.47],"V11.1":[63.95,42.41],"V11.7":[63.42,45.36],"V11.8":[64.91,45.4],"V11.10":[66.92,45.38],"V12.7":[82.07,46.14],"V12.11":[83.85,46.16],"V12.15":[81.34,47.13],"V10.5":[61.26,42.67],"V11.3":[64.57,43.5],"V13.1":[71.82,46.75],"V13.2":[75.67,46.79],"V12.5":[80.93,44.39],"V12.4":[81.53,44.69],"V1.2":[59.6,17.28],"V8.6":[60.8,17.07],"V1.5":[65.01,11.3],"V8.2":[61.64,9.34],"V8.3":[60.91,13.5],"V1.6":[65.5,12.22],"V1.4":[65.18,11.85],"V8.7":[62.34,16.61],"V8.5":[59.17,16.69],"V1.1":[53.87,15.53],"V8.10":[50.94,13.82],"V1.3":[61.67,17.28],"V8.12":[51.34,17.76],"V8.11":[51.34,14.53],"V1.7":[53.63,16.94],"V10.10":[60.79,45.12],"V13.7":[87.86,54.52]};
+let fRiOk=false,labelsOn=true;
+
+function rFlowDots(){
+  if(!fRiOk)return;
+  const inner=document.getElementById('ri-inner');
+  inner.querySelectorAll('.vlbl').forEach(d=>d.remove());
+  const lbl=document.getElementById('f-lbl');
+  let vm={},activeCount=0;
+  if(CS&&VSP&&VSP.s[String(CS)]){const s=VSP.s[String(CS)];vm=Object.fromEntries(s.o);lbl.textContent=`${CS}: ${s.n||'—'} · ${s.b||''}`;}
+  else{lbl.textContent='◈ Schritt wählen';}
+  const total=Object.keys(VP).length;
+  for(const[nm,[xp,yp]]of Object.entries(VP)){
+    const val=vm[nm];if(val)activeCount++;
+    const cls=val?vcls(val):'cl';
+    const el=document.createElement('div');
+    el.className='vlbl '+cls+(labelsOn?'':' compact');
+    el.style.left=xp+'%';el.style.top=yp+'%';
+    if(labelsOn)el.innerHTML=`${val||'–'}<span class="vn">${nm}</span>`;
+    el.title=`${nm}: ${val||'—'}`;
+    el.onclick=()=>{const sps=VSP.vi[nm]?.a?` · SPS: ${VSP.vi[nm].a}`:'';const desc=VSP.vi[nm]?.d||'';toast(`${nm}: ${val||'—'}${desc?' · '+desc:''}${sps}`);};
+    inner.appendChild(el);
+  }
+  const cnt=document.getElementById('f-vcnt');
+  if(cnt)cnt.textContent=`${activeCount}/${total}`;
+}
+function toggleVLabels(){labelsOn=!labelsOn;document.getElementById('f-lbl-btn').classList.toggle('active',labelsOn);rFlowDots();}
+function openFlowPicker(){pkT='F';document.getElementById('spinp').value='';bkPl('');document.getElementById('sp').classList.add('open');document.getElementById('spinp').focus();}
+
+// Toast
+let toastT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2000);}
+
+// Modal close handlers
+document.getElementById('dm').addEventListener('click',function(e){if(e.target===this)closeD();});
+document.getElementById('tm').addEventListener('click',function(e){if(e.target===this)closeTm();});
+document.getElementById('sp').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+
+// AI Maintenance Agent
+const AI_SYS=`Du bist der AFL Maintenance Agent für die Bausch+Ströbel Füll- und Verschließmaschine 54235 (FFV12024) bei Hoffmann-La Roche in Kaiseraugst, Schweiz.
+
+Du kennst die Maschine in- und auswendig: alle 240 Ventile, 26 CIP/SIP-Programme, 455 Schritte, Prozessparameter, Taktfolgen, Sensorik und die komplette Änderungshistorie bis V20.
+
+═══ MASCHINE ═══
+• Typ: FFV12024 Füll- und Verschließmaschine
+• Hersteller: Bausch+Ströbel
+• Kunde: Hoffmann-La Roche, Kaiseraugst, Schweiz
+• SPS-IP: 192.168.7.201
+• VSP Version: V20
+
+═══ PROGRAMME (26 Stück) ═══
+Prog. 1: Produktionsvorbereitung (über ZETA Ansatzsystem mit Begasen) (29 Schritte, 1-1160)
+Prog. 2: Produktionsvorbereitung (über ZETA Ansatzsystem ohne Begasen) (27 Schritte, 1-1160)
+Prog. 3: Produktionsvorbereitung (über Produkttank mit Begasen) (27 Schritte, 1-1160)
+Prog. 4: Produktionsvorbereitung (über Produkttank ohne Begasen) (25 Schritte, 1-1160)
+Prog. 5: CIP-SIP Füllanlage (209 Schritte, 1-17080)
+Prog. 6: CIP-SIP inkl. Begasungsstation ohne SF-Rack (237 Schritte, 1-17080)
+Prog. 7: CIP-SIP Gesamtanlage (mit SIP Gasfiltereinheiten) (283 Schritte, 1-17080)
+Prog. 8: Nadeln aus Nadelbehälter fahren (17 Schritte, 1-17080)
+Prog. 9: Nadeln in Nadelbehälter fahren (17 Schritte, 1-17080)
+Prog. 10: Flow Mod Selbsttest (20 Schritte, 1-15050)
+Prog. 11: Integritätstest Gasfilter Nr. 1 (41 Schritte, 1-17080)
+Prog. 12: Integritätstest Gasfilter Nr. 5 (41 Schritte, 1-17080)
+Prog. 13: Partikelmessung / Mikrobiologische Messung Begasungsstation (32 Schritte, 1-17080)
+Prog. 14: VHP Zyklus (35 Schritte, 1-17080)
+Prog. 15: Dichtigkeitstest (43 Schritte, 1-17080)
+Prog. 16: Integritätstest Gasfilter Nr. 2 (41 Schritte, 1-19180)
+Prog. 17: Integritätstest Gasfilter Nr. 6 (41 Schritte, 1-18180)
+Prog. 18: Integritätstest Single-Use Filter (22 Schritte, 1-22060)
+Prog. 19: CIP Füllanlage inkl. Aufheizen und trocknen ohne Integritätstest (158 Schritte, 1-17080)
+Prog. 20: CIP-SIP Gesamtanlage ohne Vorspülen und Integritätstest (mit SIP Gasfiltereinheiten) (219 Schritte, 1-17080)
+Prog. 21: CIP-SIP Gesamtanlage ohne Integritätstest (mit SIP Gasfiltereinheiten) (241 Schritte, 1-17080)
+Prog. 22: Integritätstest Gasfilter Nr. 2 und Nr. 6 (39 Schritte, 1-17080)
+Prog. 23: CIP-SIP Gesamtanlage ohne Vorspülen und Integritätstest nur PF (mit SIP Gasfiltereinheiten) (194 Schritte, 1-17080)
+Prog. 24: Musterzug Druckluft (LB) (21 Schritte, 1-20060)
+Prog. 25: Musterzug Stickstoff (G/N2) (21 Schritte, 1-20060)
+Prog. 26: Produktionsvorbereitung (über Single-Use System ohne Begasen) (28 Schritte, 1-21130)
+
+═══ PHASEN / BLÖCKE ═══
+• Ventilstellungen nach Abbruch: Schritte 1-13 (13 Schritte)
+• Anwahl Programm: Schritte 100-100 (1 Schritte)
+• Produktionsvorbereitung: Schritte 1000-1160 (29 Schritte)
+• Produktionsvorbereitung Single-Use System: Schritte 21000-21130 (14 Schritte)
+• Integritätstest Produktfilter bei Single-Use Betrieb: Schritte 22000-22060 (7 Schritte)
+• CIP / SIP Vorbereitung: Schritte 2000-2110 (14 Schritte)
+• Spülen mit WBI nach Produktion: Schritte 3000-3290 (34 Schritte)
+• Integritätstest Produktfilter nach Produktion: Schritte 4000-4340 (35 Schritte)
+• Formatwechsel durchführen: Schritte 5000-5060 (7 Schritte)
+• Dichtigkeitstest / Füllnadeldurchgangsprüfung: Schritte 6000-6140 (16 Schritte)
+• VHP Zyklus: Schritte 8000-8050 (6 Schritte)
+• Spülen mit WFI: Schritte 7000-7350 (34 Schritte)
+• Sterilisieren: Schritte 9000-9330 (34 Schritte)
+• Trocknen und Kühlen: Schritte 10000-10380 (39 Schritte)
+• Integritätstest Produktfilter nach SIP: Schritte 11000-11310 (32 Schritte)
+• Integritätstest Gasfilter nach SIP: Schritte 12000-12310 (32 Schritte)
+• Integritätstest Gasfilter Nr.5 nach SIP: Schritte 13000-13180 (19 Schritte)
+• Integritätstest Gasfilter Nr.1 nach SIP: Schritte 14000-14180 (19 Schritte)
+• Integritätstest Gasfilter Nr.6 nach SIP: Schritte 18000-18180 (19 Schritte)
+• Integritätstest Gasfilter Nr.2 nach SIP: Schritte 19000-19180 (19 Schritte)
+• Musterzug Luft / Stickstoff: Schritte 20000-20060 (9 Schritte)
+• Flow Mod Selbsttest: Schritte 15000-15050 (6 Schritte)
+• Partikelmessung / Mikrobiologische Messung Begasungsstationen: Schritte 16000-16070 (8 Schritte)
+• CIP-SIP beenden: Schritte 17000-17080 (9 Schritte)
+
+═══ VENTILE (240 Stück) ═══
+
+Medienventile:
+  V1.1: MK/W-V Kaltwasser Vorlauf
+  V1.10: 
+  V1.11: 
+  V1.12: 
+  V1.13: 
+  V1.14: 
+  V1.15: 
+  V1.16: 
+  V1.2: WBI (20°C) 5,0-6,0 bar Gereinigtes Wasser
+  V1.3: WFI (80°C) 5,0-6,0 bar Wasser für Injektion
+  V1.4: DR-S Reinstdampf 127-143°C
+  V1.5: G/N2-S Stickstoff GMP 5,0-6,0 bar
+  V1.6: LB Prozessluft 5,0-6,0 bar
+  V1.7: MK/W-R Kaltwasser Rücklauf
+  V1.8: 
+  V1.9: 
+
+Sicherheits Ventile:
+  SV1: Medienleitung Füllmaschine
+  SV10: 
+  SV11: 
+  SV12: 
+  SV13: 
+  SV14: 
+  SV15: 
+  SV16: 
+  SV2: WFI kühlen
+  SV3: Ausblasen Stichleitungen WFI Loop
+  SV4: Filtertestsystem Medienzuführung
+  SV5: 
+  SV6: Sterilfiltereinheit Be- und Entlüftung
+  SV7: Sterilfiltereinheit Nach- und Schließbegasen
+  SV8: 
+  SV9: 
+
+Stellenvereinzelungsventile:
+  V3.1: Vereinzelungsventil 1 für Pumpe 1
+  V3.10: Vereinzelungsventil 2 für Pumpe 5
+  V3.11: Vereinzelungsventil 1 für Pumpe 6
+  V3.12: Vereinzelungsventil 2 für Pumpe 6
+  V3.13: Vereinzelungsventil 1 für Pumpe 7
+  V3.14: Vereinzelungsventil 2 für Pumpe 7
+  V3.15: Vereinzelungsventil 1 für Pumpe 8
+  V3.16: Vereinzelungsventil 2 für Pumpe 8
+  V3.17: Vereinzelungsventil 1 für Pumpe 9
+  V3.18: Vereinzelungsventil 2 für Pumpe 9
+  V3.19: Vereinzelungsventil 1 für Pumpe 10
+  V3.2: Vereinzelungsventil 2 für Pumpe 1
+  V3.20: Vereinzelungsventil 2 für Pumpe 10
+  V3.21: Vereinzelungsventil 1 für Pumpe 11
+  V3.22: Vereinzelungsventil 2 für Pumpe 11
+  V3.23: Vereinzelungsventil 1 für Pumpe 12
+  V3.24: Vereinzelungsventil 2 für Pumpe 12
+  V3.25: 
+  V3.26: 
+  V3.27: 
+  V3.28: 
+  V3.29: 
+  V3.3: Vereinzelungsventil 1 für Pumpe 2
+  V3.30: 
+  V3.31: 
+  V3.32: 
+  V3.4: Vereinzelungsventil 2 für Pumpe 2
+  V3.5: Vereinzelungsventil 1 für Pumpe 3
+  V3.6: Vereinzelungsventil 2 für Pumpe 3
+  V3.7: Vereinzelungsventil 1 für Pumpe 4
+  V3.8: Vereinzelungsventil 2 für Pumpe 4
+  V3.9: Vereinzelungsventil 1 für Pumpe 5
+
+Ventile im Bereich Füllstation:
+  V4.1: Be.- und Entlüftung Dosierbehälter
+  V4.10: 
+  V4.11: 
+  V4.12: 
+  V4.13: Ablauf Medienzuführung an SV1 über Lochblende
+  V4.14: Ablauf Medienzuführung an SV1
+  V4.15: 
+  V4.16: 
+  V4.2: 
+  V4.3: 
+  V4.4: 
+  V4.5: 
+  V4.6: 
+  V4.7: Ablauf Be- und Entlüftung Dosierbehälter
+  V4.8: Ablauf Be- und Entlüftung Dosierbehälter über Lochblende
+  V4.9: 
+  V5.1: Sprühkopf 1 Dosierbehälter
+  V5.10: 
+  V5.11: Ablauf Dosierbehälter
+  V5.12: Ablauf Füllnadelbehälter oben
+  V5.13: Stickstoffbeflutung Dosierbehälter
+  V5.14: Ablauf Füllnadelbehälter oben über Lochblende
+  V5.15: 
+  V5.16: 
+  V5.2: Sprühkopf 2 Dosierbehälter
+  V5.3: Sprühkopf 3 Dosierbehälter
+  V5.4: Sprühköpfe gesamt
+  V5.5: Niveauregelventil Dosierbehälter
+  V5.6: Dosierbehälter Ablauf unten
+  V5.7: Ablauf unten Füllnadelbehälter
+  V5.8: 
+  V5.9: Ablauf Dosierbehälter über Lochblende
+
+Ventile im Bereich Nachbegasen:
+  V6.1: Zuführung WFI Verteilerrohr Nachbegasen
+  V6.10: 
+  V6.11: 
+  V6.12: 
+  V6.13: 
+  V6.14: 
+  V6.15: 
+  V6.16: 
+  V6.2: Zuführung Gas Verteilerrohr Nachbegasen
+  V6.3: Ablauf unten Nadelbehälter Nachbegasen
+  V6.4: 
+  V6.5: Zuführung Gas Verteilerrohr Schließbegasen
+  V6.6: 
+  V6.7: Zuführung WFI Verteilerrohr Schließbegasen
+  V6.8: Ablauf oben Nadelbehälter Nachbegasen
+  V6.9: 
+
+Ventile im Bereich Schließbegasen:
+  V7.1: Ablauf unten Schließbegasen über Lochblende
+  V7.10: 
+  V7.11: 
+  V7.12: 
+  V7.13: 
+  V7.14: 
+  V7.15: 
+  V7.16: 
+  V7.2: Ablauf unten Schließbegasen
+  V7.3: 
+  V7.4: 
+  V7.5: Ablauf Verteilerrohr Nachbegasen
+  V7.6: Ablauf Verteilerrohr Nachbegasen über Lochblende
+  V7.7: 
+  V7.8: 
+  V7.9: 
+
+Ventile im Bereich Medieneinheit / Wärmetauscher:
+  V8.1: Stichleitung  WBI (20°C) leerblasen
+  V8.10: Bypassventil Wärmetauscher
+  V8.11: Zulaufventil Wärmetauscher
+  V8.12: Ablaufventil Wärmetauscher
+  V8.13: 
+  V8.14: 
+  V8.15: 
+  V8.16: 
+  V8.2: Stichleitung  WFI (80°C) leerblasen
+  V8.3: Stichleitung WFI / WBI Sterilisieren
+  V8.4: Medienzuführurng Sterilfilter 5 und 6
+  V8.5: Ablauf Stichleitung WBI 20°C
+  V8.6: Ablauf Überströmventil Sterilisieren
+  V8.7: Ablauf Stichleitung WFI 80°C
+  V8.8: 
+  V8.9: Ablauf Überströmventil
+
+Ventile:
+  UEV01: Überströmventil
+  V9.10: 
+  V9.11: 
+  V9.12: 
+  V9.13: 
+  V9.14: 
+  V9.15: 
+  V9.16: 
+  V9.2: 
+  V9.3: 
+  V9.4: 
+  V9.5: 
+  V9.6: 
+  V9.7: 
+  V9.8: 
+  V9.9: 
+
+Ventile im Bereich Produktfilter:
+  V10.1: Bypass Füllmaschine
+  V10.10: Produktfilter von unten spülen
+  V10.11: 
+  V10.12: 
+  V10.13: 
+  V10.14: 
+  V10.15: 
+  V10.16: 
+  V10.2: Filtertest Produktfilter
+  V10.3: Produktfilter von oben Ausblasen (Filtertest)
+  V10.4: Produktfilter oben Filtertest
+  V10.5: Produktfilter entlüften (oben)
+  V10.6: Produktfilter Ausgang (Sterilseite)
+  V10.7: Produktfilter Produktzufuhr
+  V10.8: Ablauf Sterilseite Produktfilter
+  V10.9: Ablauf unten Produktfilter
+
+Ventile im Bereich Sterilfiltereinheit für Be.- und Entlüftung Dosierbehälter:
+  V11.1: Filtertest PF Hauptventil
+  V11.10: SF2 Eingang
+  V11.11: Zuleitung WBI  Ablauf über Kondensomat
+  V11.12: Ablauf SF2 über Kondensomat
+  V11.13: SF1 von unten fluten
+  V11.14: Ablauf unten SF1 über Kondensomat
+  V11.15: WBI-Leitung zu SF1
+  V11.16: Ablauf WBI-Leitung zu SF1
+  V11.2: Filtertest SF2
+  V11.3: SF1 entlüften (oben)
+  V11.4: Medienzuführung SF2
+  V11.5: Filtertest SF1
+  V11.6: Be.- und Entlüftungsventil Dosierbehälter (SF2 oben)
+  V11.7: SF1 Ausgang Sterilseite
+  V11.8: SF2 Ausgang Sterilseite / SF1 Eingang
+  V11.9: SF2 entlüften (oben)
+
+Ventile im Bereich Sterilfiltereinheit  für die Begasungsstationen:
+  V12.1: Zuführung WFI 23°C zu PF
+  V12.10: Ausblasen Stichleitungen WFI Loop
+  V12.11: SF6 Eingang
+  V12.12: Zuleitung WBI  Ablauf über Kondensomat
+  V12.13: 
+  V12.14: SF6 Ablauf unten über Kondensomat
+  V12.15: SF5 von unten fluten
+  V12.16: SF5 Ablauf unten  über Kondensomat
+  V12.2: Zuführung WFI 23°C zu Sterilfiltereinheiten
+  V12.3: Filtertest SF1 / SF2 Hauptventil
+  V12.4: SF5 entlüften (oben)
+  V12.5: Filtertest SF5
+  V12.6: Filtertest SF6
+  V12.7: SF6 Ausgang Sterilseite / SF5 Eingang
+  V12.8: SF6 Entlüften (oben)
+  V12.9: SF5 Ausgang Sterilseite Begasungsstationen
+
+Ventile für Nadelventil / Filtertest / Dampfkühlung:
+  V13.1: Strömungsmesser Schließbegasen
+  V13.10: 
+  V13.11: 
+  V13.12: 
+  V13.13: 
+  V13.14: 
+  V13.15: 
+  V13.16: 
+  V13.2: Strömungsmesser Nachbegasen
+  V13.3: WBI Leitung zu SF5
+  V13.4: Ablauf WBI-Leitung zu SF5
+  V13.5: Ablauf Flow Mod Filtertestgerät
+  V13.6: Ausgang Flow Mod Filtertestgerät
+  V13.7: Ausgang Flow Mod Filtertestgerät zu bauseitigem Single Use Filter
+  V13.8: 
+  V13.9: 
+
+Ventile im Bereich Ablauf:
+  V14.1: Ablauf Sterilseite Produktfilter über Lochblende
+  V14.10: Ablauf über WAI
+  V14.11: Ablauf Probeentnahmestelle an SV1
+  V14.12: Ablauf über WAS+
+  V14.13: Ablauf über WAS
+  V14.14: Ablauf unten Überströmventil
+  V14.15: Ablauf unten Wärmetauscher über Lochblende
+  V14.16: 
+  V14.2: Regelventil für Leitfähigkeitsmesssonde
+  V14.3: Ablauf Sterilseite Produktfilter
+  V14.4: SF5 Abaluf Sterilseite (unten)
+  V14.5: Sperrventil für Sammelrohr
+  V14.6: Ablauf über Lochblende an Leitfähikeitsmesssonde
+  V14.7: Ablauf Produktfilter
+  V14.8: Ablauf Produktfilter über Lochblende
+  V14.9: Ablauf Sterilfiltereinheiten
+
+═══ PROZESSPARAMETER (Formatwerte) ═══
+  FW1: Schrittzeit in min:sec
+  FW2: Minimaldruck bei Drucksensor PT1 Zuleitung Sterilfiltereinheiten
+  FW3: Minimaldruck bei Drucksensor PT3 nach Wärmetauscher
+  FW4: Minimaldruck bei Drucksensor PT4 Dosierbehälter
+  FW5: Minimaldruck bei Drucksensor PT5 Leitfähigkeitsmesssonde
+  FW6: Minimaldruck bei Drucksensor PT6 Stichleitung von Loop ausblasen
+  FW7: Minimale Temperatur bei TE1 Wärmetauscher
+  FW8: Minimale Temperatur bei TE4 Nadelbehälter Füllstation
+  FW9: Minimale Temperatur bei TE5 Nadelbehälter Nachbegasen
+  FW10: Minimale Temperatur bei TE6 Nadelbehälter Schließbegasen
+  FW11: Minimale Temperatur bei TE7 Produktfiltereinheit
+  FW12: Minimale Temperatur bei TE8 Sterilfiltereinheit Dosierbehälter
+  FW13: Minimale Temperatur bei TE10 Sterilfiltereinheit ausblasen / begasen
+  FW14: Minimale Temperatur bei TE11 Leitfähigkeitsmesssonde
+  FW15: Minimale Temperatur bei TE12 Ablauf Wärmetauscher
+  FW16: Minimale Temperatur bei TE13 Ablauf über K08
+  FW17: Maximale Leitfähigkeit bei QE1 in µS/cm
+  FW18: Automatischer Druckminderer PR01
+  FW19: Automatischer Druckminderer PR03
+  FW20: Automatischer Druckminderer PR04
+  FW21: Minimale Temperatur Filterheizung
+  FW22: Soll Temperatur Filterheizung
+  FW23: R e s e r v e
+  FW24: R e s e r v e
+  FW25: R e s e r v e
+  FW26: R e s e r v e
+  FW27: R e s e r v e
+  FW28: R e s e r v e
+  FW29: R e s e r v e
+  FW30: R e s e r v e
+  FW31: R e s e r v e
+  FW32: R e s e r v e
+
+═══ SENSORIK & MULTIPLIKATOREN ═══
+  TE1 - Sterilfilter (°C) → FW2 × 0.01 bar
+  TE2 (°C) → FW3 × 0.01 bar
+  TE3 (°C) → FW4 × 0.01 bar
+  TE4 (°C) → FW5 × 0.01 bar
+  TE5 (°C) → FW6 × 0.01 bar
+  TE6 (°C) → FW7 × 0.1 °C
+  TE7 (°C) → FW8 × 0.1 °C
+  TE8 (°C) → FW9 × 0.1 °C
+  TE9 (°C) → FW10 × 0.1 °C
+  TE10 (°C) → FW11 × 0.1 °C
+  TE11 (°C) → FW12 × 0.1 °C
+  TE12 (°C) → FW13 × 0.1 °C
+  TE13 (°C) → FW14 × 0.1 °C
+  TE14 (°C) → FW15 × 0.1 °C
+  TE15 (°C) → FW16 × 0.1 °C
+  TE16 (°C) → FW17 × 0.01 uS
+  PT1 (bar) → FW18 × 1.0 %
+  PT2 (bar) → FW19 × 1.0 %
+  PT3 (bar) → FW20 × 1.0 %
+  PT4 (bar) → FW21 × 0.1 °C
+  PT5 (bar) → FW22 × 0.1 °C
+  PT6 (bar) → FW23 × 1.0 Reserve
+  PT7 (bar) → FW24 × 1.0 Reserve
+  PT8 (bar) → FW25 × 1.0 Reserve
+  QE1 (uS) → FW26 × 1.0 Reserve
+  QE2 (uS) → FW27 × 1.0 Reserve
+  QE3 (uS) → FW28 × 1.0 Reserve
+  QE4 (uS) → FW29 × 1.0 Reserve
+  PR01 (%) → FW30 × 1.0 Reserve
+  PR02 (%) → FW31 × 1.0 Reserve
+  PR03 (%) → FW32 × 1.0 Reserve
+
+═══ VENTILTAKTUNGEN ═══
+  X: Ventil geöffnet
+  X1:  Ventil getaktet: 15 sek. geöffnet; 30 sek. geschlossen
+  X10: Ventil geöffnet wenn Reinigungsbad entleeren aktiviert
+  X11: Ventil geföffnet wenn die Steuerspannung ein ist und nicht Einrichtbetrieb
+  X12:  Ventil getaktet: 30 sek. geöffnet; 8 sek. Geschlossen
+  X2: Ventil getaktet: 1,5 sek.geöffnet; 42,5. sek gechlossen
+  X3: Ventil getaktet: 3 sek. geöffnet; 3 sek. geschlossen
+  X3N: Ventil getaktet:  3 sek. geschlossen ; 3 sek. geöffnet;
+  X4: Ventil getaktet: 1 sek. geöffnet; 35 sek. Geschlossen
+  X5: Ventil geöffnet bei X8 und UST-Befüllen aktiv
+  X6: Ventil geöffnet bei X8 und Reinigungsbad-Befüllen aktiv
+  X7: Ventile geöffnet beim Objekte aus/abblasen über Nockenschaltwerk 
+  X8: Ventile geöffnet beim Objekte aus/abwaschen über Nockenschaltwerk
+  X9: Ventil geöffnet wenn UST entleeren aktiviert
+  XA = Folge 5;21
+  XA-XN: Taktfolge: Ventile sind in einer bestimmten Reihenfolge geöffnet und geschlossen
+  XB = Folge 11
+  XC = Folge 6
+  XD = Folge 1;3;7;9;13;15;17;19;22;24
+  XE =  Folge 12;18
+  XF = Folge 2;4;8;10;14;16;20;23
+  XG = Folge 1
+  XH = Folge  2
+  XI = Folge 2;6
+  XJ = Folge  3
+  XK = Folge  4
+  XL = Folge  5
+  XM = Folge  6
+  XN = Folge  7
+
+═══ ÄNDERUNGSHISTORIE ═══
+228 Änderungen, Version V01_3 bis V20
+
+═══ DEINE AUFGABEN ═══
+1. DIAGNOSE: Wenn ein Operator ein Problem beschreibt (z.B. "Druck fällt ab bei Sterilisieren"), analysiere welche Ventile, Sensoren und Parameter betroffen sind
+2. VENTILINFO: Erkläre welches Ventil was macht, wo es sitzt, welche Taktung es hat
+3. SCHRITTANALYSE: Erkläre was in einem bestimmten Schritt passiert — welche Ventile offen sind, welche Drücke/Temperaturen erreicht werden müssen
+4. PROGRAMMFÜHRUNG: Führe durch ein CIP/SIP-Programm, erkläre die Phasen
+5. FEHLERBEHEBUNG: Gib konkrete Tipps basierend auf dem Maschinenaufbau
+6. VERGLEICH: Vergleiche Schritte oder Programme, zeige Unterschiede
+
+Antworte immer auf Deutsch, knapp und praxisnah. Du bist der Maschinenexperte an der Anlage — kein theoretisches Gelaber, sondern konkrete Infos die dem Operator an der Maschine helfen.
+
+Wenn du dir bei etwas nicht sicher bist, sag es. Besser eine ehrliche Unsicherheit als eine falsche Diagnose an einer Pharma-Anlage.`;
+
+const AI_MSGS=[];
+let AI_LOADING=false;
+function aiQ(q){document.getElementById('aiinp').value=q;aiSend();}
+async function aiSend(){
+  const inp=document.getElementById('aiinp');
+  const q=inp.value.trim();if(!q||AI_LOADING)return;
+  inp.value='';
+  AI_LOADING=true;
+  const msgs=document.getElementById('aimsgs');
+  const wel=msgs.querySelector('.ai-welcome');if(wel)wel.remove();
+  document.getElementById('aiquick').style.display='none';
+  AI_MSGS.push({role:'user',content:q});
+  const um=document.createElement('div');um.className='ai-msg user';um.textContent=q;msgs.appendChild(um);
+  const typ=document.createElement('div');typ.className='ai-typing';typ.textContent='Denke nach';msgs.appendChild(typ);
+  msgs.scrollTop=msgs.scrollHeight;
+  let ctx='';
+  if(CP&&VSP.progs[CP])ctx+=`\nAktives Programm: ${VSP.progs[CP].name} (Prog. ${CP})\n`;
+  if(CS){const s=VSP.s[String(CS)];if(s){ctx+=`Aktueller Schritt: ${CS} - ${s.n} (${s.b})\n`;if(s.fw)ctx+=`Formatwerte: ${Object.entries(s.fw).filter(([k,v])=>v!=='0').map(([k,v])=>`${k}=${v}`).join(', ')}\n`;ctx+=`Ventile: ${s.o.map(([v,c])=>`${v}=${c}`).join(', ')}\n`;}}
+  const probs=Object.entries(ST.steps).filter(([k,v])=>v.status==='problem');
+  if(probs.length)ctx+=`\nProbleme:\n`+probs.map(([seq,sd])=>`  ${seq}: ${VSP.s[seq]?.n||'?'} ${sd.comment?'→ '+sd.comment:''}`).join('\n');
+  try{
+    const resp=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`${AI_SYS}\n\n═══ AKTUELLER KONTEXT ═══${ctx||'\nKein Programm/Schritt ausgewählt.'}`,messages:AI_MSGS.map(m=>({role:m.role,content:m.content}))})
+    });
+    typ.remove();
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({}));
+      const em=document.createElement('div');em.className='ai-msg bot';
+      em.innerHTML=`⚠ Fehler: ${err.error?.message||err.error||'HTTP '+resp.status}`;
+      msgs.appendChild(em);AI_MSGS.pop();
+    }else{
+      const data=await resp.json();
+      const text=data.content?.map(c=>c.text||'').join('\n')||'Keine Antwort.';
+      AI_MSGS.push({role:'assistant',content:text});
+      const bm=document.createElement('div');bm.className='ai-msg bot';
+      bm.innerHTML=text.replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:var(--bg3);padding:1px 4px;border-radius:3px;font-family:var(--fm);font-size:.75rem">$1</code>').replace(/\n/g,'<br>');
+      msgs.appendChild(bm);
+    }
+  }catch(e){typ.remove();const em=document.createElement('div');em.className='ai-msg bot';em.innerHTML='⚠ Verbindungsfehler.';msgs.appendChild(em);AI_MSGS.pop();}
+  AI_LOADING=false;msgs.scrollTop=msgs.scrollHeight;
+}
+
+// Boot
+ld();
+const _ri=document.getElementById('ri-img');
+if(_ri&&_ri.complete&&_ri.naturalHeight>0){fRiOk=true;}
+window.addEventListener('vsp-ready',()=>{
+  document.getElementById('loading').style.display='none';
+  if(ST.user&&ST.user.loginTime&&(Date.now()-ST.user.loginTime<24*3600*1000)){
+    U=ST.user;document.getElementById('login').style.display='none';
+    document.getElementById('app').classList.add('show');
+    document.getElementById('tu').textContent=U.name;init();
+  }else{document.getElementById('login').style.display='flex';}
+});
+</script>
+<script src="vsp.js"></script>
+</body>
+</html>
