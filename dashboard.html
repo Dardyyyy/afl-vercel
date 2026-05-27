@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AFL Dashboard · Schichtleiter</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#06080c;--bg2:#0c1018;--bg3:#121824;--ac:#00d4ff;--gr:#00e87b;--yw:#ffcc00;--rd:#ff3b3b;--t1:#e8eef6;--t2:#7d93a8;--t3:#3d4f64;--bd:#151d2a;--fm:'JetBrains Mono',monospace;--fb:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);padding:0;min-height:100vh}
+.topbar{padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.logo{font-family:var(--fm);font-size:1rem;font-weight:700;color:var(--ac)}
+.logo span{color:var(--t3);font-weight:400}
+.live{display:flex;align-items:center;gap:4px;font-size:.7rem;color:var(--gr);font-family:var(--fm)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.spacer{flex:1}
+.refresh{font-size:.65rem;color:var(--t3);font-family:var(--fm)}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:16px 20px}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:16px;overflow:hidden}
+.card.full{grid-column:1/-1}
+.card-t{font-size:.68rem;color:var(--t3);font-family:var(--fm);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.big{font-family:var(--fm);font-size:2.2rem;font-weight:700;color:var(--ac);line-height:1}
+.big.gr{color:var(--gr)}.big.rd{color:var(--rd)}.big.yw{color:var(--yw)}
+.sub{font-size:.72rem;color:var(--t3);margin-top:2px}
+/* Users */
+.usr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.usr:last-child{border:none}
+.usr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.usr-dot.on{background:var(--gr)}.usr-dot.off{background:var(--t3)}
+.usr-name{font-size:.85rem;font-weight:600;flex:1}
+.usr-info{font-size:.65rem;color:var(--t3);font-family:var(--fm);text-align:right}
+/* Activity feed */
+.act{padding:5px 0;border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center;font-size:.78rem}
+.act:last-child{border:none}
+.act-time{font-family:var(--fm);font-size:.6rem;color:var(--t3);min-width:40px}
+.act-icon{font-size:.85rem}
+.act-text{flex:1;color:var(--t2)}
+.act-text strong{color:var(--t1)}
+/* Progress bars */
+.prog-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.prog-name{font-size:.72rem;color:var(--t2);min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-bar{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width 1s}
+.prog-pct{font-family:var(--fm);font-size:.65rem;color:var(--t3);min-width:30px;text-align:right}
+/* Problems */
+.prob{padding:6px 0;border-bottom:1px solid var(--bd)}
+.prob:last-child{border:none}
+.prob-step{font-family:var(--fm);font-size:.72rem;color:var(--rd)}
+.prob-name{font-size:.78rem;color:var(--t1)}
+.prob-meta{font-size:.65rem;color:var(--t3)}
+.empty{color:var(--t3);font-size:.8rem;padding:12px 0;text-align:center}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">◈ AFL <span>Dashboard</span></div>
+  <div class="live"><div class="live-dot"></div>LIVE</div>
+  <div class="spacer"></div>
+  <div class="refresh" id="lastUpdate">—</div>
+</div>
+
+<div class="grid">
+  <!-- Stats -->
+  <div class="card" id="cUsers"><div class="card-t">Aktive User</div><div class="big" id="nUsers">—</div><div class="sub" id="sUsers"></div></div>
+  <div class="card"><div class="card-t">Schritte erledigt</div><div class="big gr" id="nDone">—</div><div class="sub" id="sDone"></div></div>
+  <div class="card"><div class="card-t">Probleme</div><div class="big rd" id="nProb">—</div><div class="sub" id="sProb"></div></div>
+
+  <!-- Online Users -->
+  <div class="card"><div class="card-t">Team Online</div><div id="userList"><div class="empty">Warte auf Daten…</div></div></div>
+
+  <!-- Program Progress -->
+  <div class="card" style="grid-column:span 2"><div class="card-t">Programm-Fortschritt</div><div id="progList"><div class="empty">Warte auf Daten…</div></div></div>
+
+  <!-- Problems -->
+  <div class="card"><div class="card-t">Aktuelle Probleme</div><div id="probList"><div class="empty">Keine Probleme</div></div></div>
+
+  <!-- Activity Feed -->
+  <div class="card full"><div class="card-t">Aktivitäts-Feed</div><div id="actFeed"><div class="empty">Warte auf Daten…</div></div></div>
+</div>
+
+<script>
+const POLL_MS=5000;
+let vspData=null;
+
+async function loadVSP(){
+  try{
+    const resp=await fetch('/vsp.js');
+    const text=await resp.text();
+    // Extract VSP object by eval
+    const fn=new Function(text.replace("window.dispatchEvent(new Event('vsp-ready'));","")+'return VSP;');
+    vspData=fn();
+  }catch(e){console.log('VSP load failed',e);}
+}
+
+async function poll(){
+  try{
+    const resp=await fetch('/api/sync');
+    const data=await resp.json();
+    render(data);
+    document.getElementById('lastUpdate').textContent='Update: '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }catch(e){
+    document.getElementById('lastUpdate').textContent='⚠ Offline';
+  }
+}
+
+function render(data){
+  const {steps,users,reports,activity}=data;
+
+  // Count online users
+  const online=Object.values(users).filter(u=>u.online);
+  const total=Object.keys(users).length;
+  document.getElementById('nUsers').textContent=online.length;
+  document.getElementById('sUsers').textContent=`${total} gesamt`;
+
+  // Count steps
+  const allSteps=Object.values(steps);
+  const done=allSteps.filter(s=>s.status==='done').length;
+  const prob=allSteps.filter(s=>s.status==='problem').length;
+  const skip=allSteps.filter(s=>s.status==='skip').length;
+  document.getElementById('nDone').textContent=done;
+  document.getElementById('sDone').textContent=`${skip} übersprungen`;
+  document.getElementById('nProb').textContent=prob;
+  document.getElementById('sProb').textContent=prob?'Achtung!':'Alles gut';
+
+  // User list
+  let uh='';
+  const sorted=[...Object.values(users)].sort((a,b)=>(b.online?1:0)-(a.online?1:0));
+  for(const u of sorted){
+    const ago=u.lastSeen?Math.round((Date.now()-u.lastSeen)/60000):999;
+    const agoStr=ago<1?'gerade eben':ago<60?`vor ${ago} min`:`vor ${Math.round(ago/60)}h`;
+    const stepInfo=u.currentStep&&vspData?.s?.[String(u.currentStep)]?`Schritt ${u.currentStep}`:'';
+    uh+=`<div class="usr"><div class="usr-dot ${u.online?'on':'off'}"></div><div class="usr-name">${u.name}</div><div class="usr-info">${stepInfo?stepInfo+'<br>':''}${agoStr}</div></div>`;
+  }
+  document.getElementById('userList').innerHTML=uh||'<div class="empty">Niemand online</div>';
+
+  // Program progress
+  if(vspData?.progs){
+    let ph='';
+    for(const[pid,p]of Object.entries(vspData.progs)){
+      const dn=p.steps.filter(s=>steps[s]?.status==='done').length;
+      const pct=p.steps.length?Math.round(dn/p.steps.length*100):0;
+      if(dn===0&&pct===0)continue; // Skip untouched programs
+      const color=pct===100?'var(--gr)':pct>50?'var(--ac)':'var(--yw)';
+      ph+=`<div class="prog-row"><div class="prog-name" title="${p.name}">${p.name}</div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div><div class="prog-pct">${pct}%</div></div>`;
+    }
+    document.getElementById('progList').innerHTML=ph||'<div class="empty">Kein Programm gestartet</div>';
+  }
+
+  // Problems
+  let prh='';
+  const probs=Object.entries(steps).filter(([k,v])=>v.status==='problem').sort((a,b)=>b[1].time-a[1].time);
+  for(const[seq,s]of probs.slice(0,10)){
+    const name=vspData?.s?.[seq]?.n||'—';
+    const ago=s.time?Math.round((Date.now()-s.time)/60000):0;
+    prh+=`<div class="prob"><div class="prob-step">Schritt ${seq}</div><div class="prob-name">${name}</div><div class="prob-meta">${s.user||'?'} · vor ${ago<60?ago+' min':Math.round(ago/60)+'h'}${s.comment?' · '+s.comment:''}</div></div>`;
+  }
+  document.getElementById('probList').innerHTML=prh||'<div class="empty">✓ Keine Probleme</div>';
+
+  // Activity feed
+  const icons={done:'✅',skip:'↷',problem:'⚠️',login:'👤',logout:'👋',report:'📋',reset:'🔄'};
+  let ah='';
+  for(const a of[...activity].reverse().slice(0,20)){
+    const time=new Date(a.t).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    const stepName=a.s&&vspData?.s?.[String(a.s)]?` — ${vspData.s[String(a.s)].n}`:'';
+    const icon=icons[a.a]||'●';
+    let text='';
+    if(a.a==='done')text=`<strong>${a.u}</strong> hat Schritt ${a.s} erledigt${stepName}`;
+    else if(a.a==='problem')text=`<strong>${a.u}</strong> meldet Problem bei Schritt ${a.s}${stepName}`;
+    else if(a.a==='skip')text=`<strong>${a.u}</strong> hat Schritt ${a.s} übersprungen${stepName}`;
+    else if(a.a==='login')text=`<strong>${a.u}</strong> hat sich angemeldet`;
+    else if(a.a==='logout')text=`<strong>${a.u}</strong> hat sich abgemeldet`;
+    else if(a.a==='report')text=`<strong>${a.u}</strong> hat einen Bericht erstellt`;
+    else if(a.a==='reset')text=`<strong>${a.u}</strong> hat den Status zurückgesetzt`;
+    else text=`<strong>${a.u}</strong> — ${a.a}`;
+    ah+=`<div class="act"><div class="act-time">${time}</div><div class="act-icon">${icon}</div><div class="act-text">${text}</div></div>`;
+  }
+  document.getElementById('actFeed').innerHTML=ah||'<div class="empty">Keine Aktivität</div>';
+}
+
+// Boot
+loadVSP().then(()=>{poll();setInterval(poll,POLL_MS);});
+</script>
+</body>
+</html>
