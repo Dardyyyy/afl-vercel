@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0a0c0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AFL">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>◈ AFL · 54235 · Roche Kaiseraugst</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -609,6 +613,47 @@ function openD(seq){
   document.getElementById('dcmt').value=ss.comment||'';
 
   let html='';
+
+  // DIFF to previous step
+  if(CP&&VSP.progs[CP]){
+    const steps=VSP.progs[CP].steps;
+    const idx=steps.indexOf(seq);
+    if(idx>0){
+      const prevSeq=steps[idx-1];
+      const prevS=VSP.s[String(prevSeq)];
+      if(prevS){
+        const curMap=Object.fromEntries(s.o);
+        const prevMap=Object.fromEntries(prevS.o);
+        const allV=[...new Set([...Object.keys(curMap),...Object.keys(prevMap)])];
+        const opened=[],closed=[],changed=[];
+        for(const v of allV){
+          const c=curMap[v],p=prevMap[v];
+          if(c&&!p)opened.push([v,c]);
+          else if(!c&&p)closed.push([v,p]);
+          else if(c&&p&&c!==p)changed.push([v,p,c]);
+        }
+        if(opened.length||closed.length||changed.length){
+          html+=`<div class="fwsec"><div class="fwtitle">Änderungen vs. Schritt ${prevSeq}</div>`;
+          if(opened.length){
+            html+=`<div style="margin-bottom:4px"><div style="font-size:.65rem;color:var(--gr);font-family:var(--fm);margin-bottom:3px">🟢 NEU GEÖFFNET (${opened.length})</div><div class="vchips">`;
+            for(const[v,c]of opened)html+=`<div class="vc op">${v} <span style="font-size:.6rem;opacity:.75">${c}</span></div>`;
+            html+=`</div></div>`;
+          }
+          if(closed.length){
+            html+=`<div style="margin-bottom:4px"><div style="font-size:.65rem;color:var(--rd);font-family:var(--fm);margin-bottom:3px">🔴 GESCHLOSSEN (${closed.length})</div><div class="vchips">`;
+            for(const[v,c]of closed)html+=`<div class="vc" style="background:var(--rdd);border-color:rgba(255,59,59,.25);color:var(--rd)">${v} <span style="font-size:.6rem;opacity:.75">war ${c}</span></div>`;
+            html+=`</div></div>`;
+          }
+          if(changed.length){
+            html+=`<div style="margin-bottom:4px"><div style="font-size:.65rem;color:var(--yw);font-family:var(--fm);margin-bottom:3px">🔄 GEÄNDERT (${changed.length})</div><div class="vchips">`;
+            for(const[v,p,c]of changed)html+=`<div class="vc tg">${v} <span style="font-size:.6rem;opacity:.75">${p}→${c}</span></div>`;
+            html+=`</div></div>`;
+          }
+          html+=`</div>`;
+        }
+      }
+    }
+  }
 
   // Kommentar from Excel
   if(s.km)html+=`<div class="dkm">💡 ${s.km}</div>`;
@@ -1343,6 +1388,7 @@ window.addEventListener('vsp-ready',()=>{
     document.getElementById('tu').textContent=U.name;init();
   }else{document.getElementById('login').style.display='flex';}
 });
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
 <script src="vsp.js"></script>
 </body>
