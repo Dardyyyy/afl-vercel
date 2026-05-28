@@ -139,6 +139,33 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .bx{flex:1;padding:8px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t2);font-size:.78rem;cursor:pointer;font-family:var(--fm);transition:background .15s;text-align:center}
 .bx:hover{background:var(--bg4)}
 
+/* Step Analysis */
+.sa-wrap{padding:8px 16px}
+.sa-title{font-family:var(--fm);font-size:.62rem;color:var(--ac);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.sa-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.sa-card{background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px}
+.sa-card.full{grid-column:1/-1}
+.sa-lbl{font-size:.58rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.sa-val{font-size:1rem;font-weight:700;font-family:var(--fm);color:var(--t1)}
+.sa-val.sm{font-size:.82rem;font-weight:600}
+.sa-sub{font-size:.6rem;color:var(--t3);margin-top:2px}
+.sa-bar{height:4px;background:var(--bd2);border-radius:2px;margin-top:5px;overflow:hidden}
+.sa-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.sa-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.sa-tag{font-size:.58rem;font-family:var(--fm);padding:2px 6px;border-radius:4px;border:1px solid var(--bd2);color:var(--t2)}
+.sa-tag.tk{background:var(--acd);border-color:rgba(0,212,255,.2);color:var(--ac)}
+.sa-tag.dr{background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.2);color:#ff6b35}
+.sa-tag.bd{background:var(--pud);border-color:rgba(167,139,250,.2);color:var(--pu)}
+.sa-tag.fg{background:var(--ywd);border-color:rgba(255,204,0,.2);color:var(--yw)}
+.sa-tag.st{background:rgba(128,128,128,.12);border-color:rgba(128,128,128,.2);color:var(--t2)}
+.sa-ref{padding:4px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.sa-ref:hover{background:var(--bg3)}
+.sa-ref:last-child{border-bottom:none}
+.sa-pips{display:flex;gap:2px;margin-top:4px}
+.sa-pip{width:6px;height:6px;border-radius:50%;background:var(--bd2)}
+.sa-pip.on{background:var(--ac)}
+.sa-pip.prev{background:var(--gr)}
+
 /* Timer modal */
 #tm{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #tm.open{display:flex}
@@ -212,16 +239,42 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 #ri-wrap{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;min-height:0;position:relative;background:#e8e7e0}
 #ri-inner{position:relative;display:inline-block;min-width:1400px}
 #ri-img{display:block;width:1400px;height:auto;max-width:none}
-.vlbl{position:absolute;transform:translate(-50%,-50%);z-index:10;cursor:pointer;transition:transform .1s,box-shadow .1s;font-family:var(--fm);white-space:nowrap;border-radius:3px;padding:1px 4px;font-size:8px;font-weight:700;line-height:1.3;text-align:center;border:1px solid rgba(0,0,0,.2);box-shadow:0 1px 3px rgba(0,0,0,.2);user-select:none}
-.vlbl:hover,.vlbl:active{transform:translate(-50%,-50%) scale(1.5);z-index:30;box-shadow:0 3px 12px rgba(0,0,0,.4)}
-.vlbl .vn{display:block;font-size:6px;font-weight:400;opacity:.7;letter-spacing:.2px}
-.vlbl.op{background:#00c853;color:#000;border-color:#009624}
-.vlbl.nu{background:#00b0ff;color:#000;border-color:#0081cb}
-.vlbl.tg{background:#ffd600;color:#000;border-color:#c7a500}
-.vlbl.ot{background:#b388ff;color:#000;border-color:#7c4dff}
-.vlbl.cl{background:rgba(220,220,215,.7);color:#888;border-color:rgba(180,180,175,.5);font-weight:400}
+
+/* Valve labels — enhanced */
+.vlbl{position:absolute;transform:translate(-50%,-50%);z-index:10;cursor:pointer;transition:transform .15s,box-shadow .15s,filter .15s;font-family:var(--fm);white-space:nowrap;border-radius:4px;padding:2px 5px;font-size:8px;font-weight:700;line-height:1.3;text-align:center;border:1.5px solid rgba(0,0,0,.2);user-select:none}
+.vlbl:hover,.vlbl:active{transform:translate(-50%,-50%) scale(1.6);z-index:30;filter:brightness(1.2)}
+.vlbl .vn{display:block;font-size:6px;font-weight:500;opacity:.8;letter-spacing:.2px}
+.vlbl .vx{display:block;font-size:5px;font-weight:400;opacity:.6;letter-spacing:.1px;margin-top:0px;max-width:60px;overflow:hidden;text-overflow:ellipsis}
+
+/* Open = green glow */
+.vlbl.op{background:#00c853;color:#000;border-color:#009624;box-shadow:0 0 6px rgba(0,200,83,.5),0 1px 3px rgba(0,0,0,.2)}
+
+/* Takt = blue pulse */
+.vlbl.nu{background:#00b0ff;color:#000;border-color:#0081cb;box-shadow:0 0 6px rgba(0,176,255,.5),0 1px 3px rgba(0,0,0,.2);animation:taktPulse 2s ease-in-out infinite}
+@keyframes taktPulse{0%,100%{box-shadow:0 0 4px rgba(0,176,255,.4),0 1px 3px rgba(0,0,0,.2)}50%{box-shadow:0 0 12px rgba(0,176,255,.8),0 0 20px rgba(0,176,255,.3),0 1px 3px rgba(0,0,0,.2)}}
+
+/* Druck = orange breathe */
+.vlbl.dr{background:#ff6d00;color:#000;border-color:#c43e00;box-shadow:0 0 6px rgba(255,109,0,.5),0 1px 3px rgba(0,0,0,.2);animation:druckBreathe 3s ease-in-out infinite}
+@keyframes druckBreathe{0%,100%{box-shadow:0 0 4px rgba(255,109,0,.4),0 1px 3px rgba(0,0,0,.2)}50%{box-shadow:0 0 10px rgba(255,109,0,.7),0 0 18px rgba(255,109,0,.25),0 1px 3px rgba(0,0,0,.2)}}
+
+/* Taktfolge = yellow shimmer */
+.vlbl.tg{background:#ffd600;color:#000;border-color:#c7a500;box-shadow:0 0 6px rgba(255,214,0,.5),0 1px 3px rgba(0,0,0,.2);animation:folgeShimmer 1.5s ease-in-out infinite}
+@keyframes folgeShimmer{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+
+/* Bedingt / Schritt = purple steady glow */
+.vlbl.ot{background:#b388ff;color:#000;border-color:#7c4dff;box-shadow:0 0 8px rgba(124,77,255,.5),0 1px 3px rgba(0,0,0,.2)}
+
+/* Closed = subtle */
+.vlbl.cl{background:rgba(220,220,215,.55);color:#999;border-color:rgba(180,180,175,.4);font-weight:400;box-shadow:none}
+
+/* Compact mode */
 .vlbl.compact{padding:0;width:10px;height:10px;border-radius:50%;font-size:0;overflow:hidden}
-.vlbl.compact .vn{display:none}
+.vlbl.compact .vn,.vlbl.compact .vx{display:none}
+.vlbl.compact.op{box-shadow:0 0 8px rgba(0,200,83,.6)}
+.vlbl.compact.nu{box-shadow:0 0 8px rgba(0,176,255,.6);animation:taktPulse 2s ease-in-out infinite}
+.vlbl.compact.dr{box-shadow:0 0 8px rgba(255,109,0,.6);animation:druckBreathe 3s ease-in-out infinite}
+.vlbl.compact.tg{box-shadow:0 0 8px rgba(255,214,0,.6);animation:folgeShimmer 1.5s ease-in-out infinite}
+.vlbl.compact.ot{box-shadow:0 0 8px rgba(124,77,255,.6)}
 
 /* Report Archive */
 .rp-tabs{display:flex;gap:0;margin-bottom:10px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--bd)}
@@ -418,11 +471,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
         </div>
       </div>
       <div class="f-legend">
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--gr)"></div>Offen</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--ac)"></div>Getaktet</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--yw)"></div>0/1</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:var(--pu)"></div>Sonst.</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:rgba(74,93,114,.3)"></div>Zu</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#00c853;box-shadow:0 0 4px rgba(0,200,83,.5)"></div>● Offen</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#00b0ff;box-shadow:0 0 4px rgba(0,176,255,.5)"></div>⟳ Getaktet</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#ff6d00;box-shadow:0 0 4px rgba(255,109,0,.5)"></div>◈ Druck</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#ffd600;box-shadow:0 0 4px rgba(255,214,0,.5)"></div>⫸ Taktfolge</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#b388ff;box-shadow:0 0 4px rgba(124,77,255,.5)"></div>◑ Bedingt</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:rgba(220,220,215,.55)"></div>Zu</div>
         <div class="f-legend-item" style="margin-left:auto;color:var(--ac)"><span id="f-vcnt"></span></div>
       </div>
       <div id="ri-wrap"><div id="ri-inner">
@@ -635,6 +689,113 @@ function openD(seq){
   document.getElementById('dcmt').value=ss.comment||'';
 
   let html='';
+  const tDesc=(c)=>{if(!c||c==='X'||c==='x')return'Offen';const td=VSP.td?.[c];return td||c;};
+  const vDesc=(v)=>{const d=VSP.vi[v]?.d;return d?`<span style="font-size:.58rem;color:var(--t3);display:block;margin-top:1px">${d.length>35?d.slice(0,33)+'…':d}</span>`:''};
+
+  // ═══ STEP ANALYSIS SECTION ═══
+  const totalV=s.o.length;
+  const openV=s.o.filter(([v,c])=>c==='X'||c==='x').length;
+  const taktV=s.o.filter(([v,c])=>c!=='X'&&c!=='x').length;
+  const usedCodes=new Set(s.o.map(([v,c])=>c).filter(c=>c!=='X'&&c!=='x'));
+  // Categorize codes
+  const codesByCat={tk:0,dr:0,bd:0,fg:0,st:0};
+  for(const code of usedCodes){
+    const td=VSP.td?.[code]||'';
+    if(td.startsWith('Getaktet')||td.includes('getaktet'))codesByCat.tk++;
+    else if(td.includes('Druck')||td.includes('PT'))codesByCat.dr++;
+    else if(td.startsWith('Taktfolge'))codesByCat.fg++;
+    else if(td.includes('Schritt'))codesByCat.st++;
+    else codesByCat.bd++;
+  }
+  // Position in program
+  let progPos='',progTotal=0,progIdx=-1,stepPips='';
+  if(CP&&VSP.progs[CP]){
+    const steps=VSP.progs[CP].steps;
+    progTotal=steps.length;
+    progIdx=steps.indexOf(seq);
+    const pct=progTotal>0?Math.round(((progIdx+1)/progTotal)*100):0;
+    progPos=`${progIdx+1} / ${progTotal}`;
+    // Mini-pips (max 20 shown)
+    const maxPips=Math.min(progTotal,20);
+    const step=progTotal>20?progTotal/20:1;
+    stepPips='<div class="sa-pips">';
+    for(let i=0;i<maxPips;i++){
+      const realIdx=Math.round(i*step);
+      const isCur=realIdx===progIdx;
+      const isPrev=realIdx<progIdx;
+      stepPips+=`<div class="sa-pip${isCur?' on':''}${isPrev?' prev':''}"></div>`;
+    }
+    stepPips+='</div>';
+  }
+  // Schrittzeit
+  const zeitVal=s.fw?.FW1||'0';
+  const zeitSek=parseInt(zeitVal);
+  const zeitStr=zeitSek>0?(zeitSek>=60?`${Math.floor(zeitSek/60)}m ${zeitSek%60?zeitSek%60+'s':''}`:zeitSek+'s'):'—';
+  // Count groups
+  const grpCount={};
+  for(const[v,c]of s.o){const g=VSP.vi[v]?.g||'Sonstige';grpCount[g]=(grpCount[g]||0)+1;}
+
+  html+=`<div class="sa-wrap"><div class="sa-title">Schritt-Analyse</div>`;
+  html+=`<div class="sa-grid">`;
+  html+=`<div class="sa-card"><div class="sa-lbl">Ventile gesamt</div><div class="sa-val">${totalV}</div><div class="sa-sub">${openV} offen · ${taktV} gesteuert</div><div class="sa-bar"><div class="sa-fill" style="width:${totalV>0?Math.round(openV/totalV*100):0}%;background:var(--gr)"></div></div></div>`;
+  html+=`<div class="sa-card"><div class="sa-lbl">Schrittzeit</div><div class="sa-val">${zeitStr}</div><div class="sa-sub">${s.km?s.km.length>40?s.km.slice(0,38)+'…':s.km:'Kein Kommentar'}</div></div>`;
+  if(progPos){
+    html+=`<div class="sa-card"><div class="sa-lbl">Position im Programm</div><div class="sa-val sm">${progPos}</div>${stepPips}</div>`;
+  }
+  html+=`<div class="sa-card"><div class="sa-lbl">Ventilgruppen</div><div class="sa-val sm">${Object.keys(grpCount).length}</div><div class="sa-sub">${Object.entries(grpCount).slice(0,3).map(([g,n])=>`${g.split('/')[0].split(' ')[0]} ${n}`).join(' · ')}</div></div>`;
+  html+=`</div>`; // sa-grid
+
+  // Code category tags
+  if(usedCodes.size>0){
+    html+=`<div class="sa-tags">`;
+    if(codesByCat.tk)html+=`<span class="sa-tag tk">⏱ ${codesByCat.tk} getaktet</span>`;
+    if(codesByCat.dr)html+=`<span class="sa-tag dr">📊 ${codesByCat.dr} druckgesteuert</span>`;
+    if(codesByCat.bd)html+=`<span class="sa-tag bd">⚙ ${codesByCat.bd} bedingt</span>`;
+    if(codesByCat.fg)html+=`<span class="sa-tag fg">🔄 ${codesByCat.fg} Taktfolge</span>`;
+    if(codesByCat.st)html+=`<span class="sa-tag st">📋 ${codesByCat.st} Schrittsteuerung</span>`;
+    html+=`</div>`;
+  }
+
+  // Cross-references: where else is this step referenced, similar steps
+  if(CP&&VSP.progs[CP]&&progIdx>=0){
+    const steps=VSP.progs[CP].steps;
+    // Find similar steps (same Ventile count ±3, same program)
+    const simSteps=[];
+    for(const otherSeq of steps){
+      if(otherSeq===seq)continue;
+      const os=VSP.s[String(otherSeq)];
+      if(!os)continue;
+      const otherMap=Object.fromEntries(os.o);
+      const curMap=Object.fromEntries(s.o);
+      const common=Object.keys(curMap).filter(v=>otherMap[v]).length;
+      const similarity=totalV>0?Math.round(common/Math.max(totalV,os.o.length)*100):0;
+      if(similarity>=70)simSteps.push({seq:otherSeq,name:os.n,sim:similarity,vc:os.o.length});
+    }
+    simSteps.sort((a,b)=>b.sim-a.sim);
+    if(simSteps.length>0){
+      html+=`<div style="margin-top:8px"><div style="font-size:.58rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:4px">ÄHNLICHE SCHRITTE (≥70% gleiche Ventile)</div>`;
+      for(const si of simSteps.slice(0,5)){
+        html+=`<div class="sa-ref" onclick="closeD();setTimeout(()=>openD(${si.seq}),200)"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--fm);font-size:.72rem;color:var(--ac)">${si.seq}</span><span style="font-size:.6rem;font-family:var(--fm);color:${si.sim>=90?'var(--gr)':'var(--yw)'}">${si.sim}%</span></div><div style="font-size:.68rem;color:var(--t2)">${si.name}</div></div>`;
+      }
+      html+=`</div>`;
+    }
+  }
+
+  // Ventil-Reuse: which valves in this step appear most across all steps
+  const vFreq={};
+  for(const[v]of s.o){let cnt=0;for(const[,os]of Object.entries(VSP.s)){if(os.o.some(([ov])=>ov===v))cnt++;}vFreq[v]=cnt;}
+  const topUsed=Object.entries(vFreq).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  if(topUsed.length>0){
+    html+=`<div style="margin-top:6px"><div style="font-size:.58rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:4px">MEIST VERWENDETE VENTILE (SYSTEMWEIT)</div>`;
+    const maxFreq=Math.max(...topUsed.map(([,n])=>n));
+    for(const[v,n]of topUsed){
+      const pct=Math.round(n/Object.keys(VSP.s).length*100);
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><span style="font-family:var(--fm);font-size:.72rem;font-weight:600;color:var(--t1);min-width:44px">${v}</span><div style="flex:1;height:3px;background:var(--bd2);border-radius:2px;overflow:hidden"><div style="height:100%;width:${Math.round(n/maxFreq*100)}%;background:var(--ac);border-radius:2px"></div></div><span style="font-size:.6rem;font-family:var(--fm);color:var(--t3)">${pct}%</span></div>`;
+    }
+    html+=`</div>`;
+  }
+
+  html+=`</div>`; // sa-wrap END
 
   // DIFF to previous step
   if(CP&&VSP.progs[CP]){
@@ -655,8 +816,6 @@ function openD(seq){
           else if(c&&p&&c!==p)changed.push([v,p,c]);
         }
         if(opened.length||closed.length||changed.length){
-          const vDesc=(v)=>{const d=VSP.vi[v]?.d;return d?`<span style="font-size:.58rem;color:var(--t3);display:block;margin-top:1px">${d.length>35?d.slice(0,33)+'…':d}</span>`:''};
-          const tDesc=(c)=>{if(!c||c==='X'||c==='x')return'Offen';const td=VSP.td?.[c];return td||c;};
           html+=`<div class="fwsec"><div class="fwtitle">Änderungen vs. Schritt ${prevSeq} (${prevS.n||'—'})</div>`;
           if(opened.length){
             html+=`<div style="margin-bottom:8px"><div style="font-size:.65rem;color:var(--gr);font-family:var(--fm);margin-bottom:4px">🟢 NEU GEÖFFNET — ${opened.length} Ventile</div>`;
@@ -686,10 +845,8 @@ function openD(seq){
   if(s.fw){
     const entries=Object.entries(s.fw).filter(([k,v])=>v!=='0'&&!k.match(/FW2[3-9]|FW3[0-2]/));
     if(entries.length>0){
-      // Sort: time first, then pressure, temp, conductivity, ctrl
       const order={time:0,press:1,temp:2,cond:3,ctrl:4};
       entries.sort((a,b)=>(order[fwType(a[0])]||5)-(order[fwType(b[0])]||5));
-      // Schrittzeit as full-width header card
       const zeitEntry=entries.find(([k])=>k==='FW1');
       const rest=entries.filter(([k])=>k!=='FW1');
       html+=`<div class="fwsec"><div class="fwtitle">Prozessparameter</div>`;
@@ -711,14 +868,20 @@ function openD(seq){
   }
 
   // Taktung legend if step has non-X codes
-  const usedCodes=new Set(s.o.map(([v,c])=>c).filter(c=>c!=='X'&&c!=='x'));
   if(usedCodes.size>0){
     html+=`<div class="fwsec"><div class="fwtitle">Ventiltaktungen in diesem Schritt</div><div style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px">`;
     for(const code of [...usedCodes].sort()){
       const td=VSP.td?.[code]||'';
       if(!td)continue;
       const cls=vcls(code);
-      html+=`<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><span class="vc ${cls}" style="min-width:fit-content;margin:0">${code}</span><span style="font-size:.72rem;color:var(--t2)">${td}</span></div>`;
+      // Add category tag
+      let catTag='';
+      if(td.startsWith('Getaktet')||td.includes('getaktet'))catTag='<span class="sa-tag tk" style="margin-left:auto;font-size:.5rem;padding:1px 4px">TAKT</span>';
+      else if(td.includes('Druck')||td.includes('PT'))catTag='<span class="sa-tag dr" style="margin-left:auto;font-size:.5rem;padding:1px 4px">DRUCK</span>';
+      else if(td.startsWith('Taktfolge'))catTag='<span class="sa-tag fg" style="margin-left:auto;font-size:.5rem;padding:1px 4px">FOLGE</span>';
+      else if(td.includes('Schritt'))catTag='<span class="sa-tag st" style="margin-left:auto;font-size:.5rem;padding:1px 4px">SCHRITT</span>';
+      else catTag='<span class="sa-tag bd" style="margin-left:auto;font-size:.5rem;padding:1px 4px">BEDINGT</span>';
+      html+=`<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><span class="vc ${cls}" style="min-width:fit-content;margin:0">${code}</span><span style="font-size:.72rem;color:var(--t2);flex:1">${td}</span>${catTag}</div>`;
     }
     html+=`</div></div>`;
   }
@@ -884,15 +1047,57 @@ function rFlowDots(){
   if(CS&&VSP&&VSP.s[String(CS)]){const s=VSP.s[String(CS)];vm=Object.fromEntries(s.o);lbl.textContent=`${CS}: ${s.n||'—'} · ${s.b||''}`;}
   else{lbl.textContent='◈ Schritt wählen';}
   const total=Object.keys(VP).length;
+  // Classify valve code into visual category
+  const vCat=(code)=>{
+    if(!code||code==='X'||code==='x')return'op'; // open
+    const td=VSP.td?.[code]||'';
+    if(td.includes('Druckgeregelt')||td.includes('Druckgetaktet')||td.includes('EPOS'))return'dr'; // pressure
+    if(td.includes('Taktfolge'))return'tg'; // sequence
+    if(td.includes('Wechseltakt')||td.includes('Kurzstoß')||td.includes('Schnelltakt')||td.includes('Langsamtakt')||td.includes('Gegentakt')||td.includes('Verzögerter')||td.includes('Einmalöffnung'))return'nu'; // timed
+    if(td.includes('Nur aktiv')||td.includes('Schritt nur')||td.includes('Manuell')||td.includes('Produktabhängig')||td.includes('Öffnet wenn')||td.includes('Schließt'))return'ot'; // conditional
+    if(code.startsWith('X')&&code.length>1)return'nu';
+    return'op';
+  };
+  // Short label for inside the valve marker
+  const vShort=(code)=>{
+    if(!code||code==='X'||code==='x')return'●';
+    const td=VSP.td?.[code]||'';
+    if(td.includes('Wechseltakt')||td.includes('Kurzstoß')||td.includes('Schnelltakt')||td.includes('Langsamtakt')||td.includes('Gegentakt'))return'⟳';
+    if(td.includes('Druckgeregelt')||td.includes('Druckgetaktet'))return'◈';
+    if(td.includes('Taktfolge'))return'⫸';
+    if(td.includes('EPOS'))return'↗';
+    if(td.includes('Manuell'))return'✋';
+    if(td.includes('Nur aktiv'))return'◑';
+    if(td.includes('Produktabhängig'))return'⚙';
+    if(td.includes('Öffnet wenn'))return'◑';
+    if(td.includes('Schließt'))return'◐';
+    if(td.includes('Schritt'))return'▸';
+    if(td.includes('Verzögerter'))return'⏳';
+    if(td.includes('Einmalöffnung'))return'①';
+    if(td.includes('Dosierbehälter'))return'▽';
+    return code;
+  };
   for(const[nm,[xp,yp]]of Object.entries(VP)){
     const val=vm[nm];if(val)activeCount++;
-    const cls=val?vcls(val):'cl';
+    const cls=val?vCat(val):'cl';
+    const td=val?VSP.td?.[val]||'':'';
+    // Short description for expanded labels (first meaningful part)
+    let shortDesc='';
+    if(td&&val!=='X'&&val!=='x'){
+      const m=td.match(/^([^:—]+)/);
+      shortDesc=m?m[1].trim():'';
+      if(shortDesc.length>18)shortDesc=shortDesc.slice(0,16)+'…';
+    }
     const el=document.createElement('div');
     el.className='vlbl '+cls+(labelsOn?'':' compact');
     el.style.left=xp+'%';el.style.top=yp+'%';
-    if(labelsOn)el.innerHTML=`${val||'–'}<span class="vn">${nm}</span>`;
-    el.title=`${nm}: ${val||'—'}`;
-    el.onclick=()=>{const sps=VSP.vi[nm]?.a?` · SPS: ${VSP.vi[nm].a}`:'';const desc=VSP.vi[nm]?.d||'';toast(`${nm}: ${val||'—'}${desc?' · '+desc:''}${sps}`);};
+    if(labelsOn){
+      const sym=val?vShort(val):'–';
+      el.innerHTML=`${sym} <span class="vn">${nm}</span>${shortDesc?`<span class="vx">${shortDesc}</span>`:''}`;
+    }
+    const fullDesc=td?(nm+': '+td):(nm+': geschlossen');
+    el.title=fullDesc;
+    el.onclick=()=>{toast(fullDesc);};
     inner.appendChild(el);
   }
   const cnt=document.getElementById('f-vcnt');
