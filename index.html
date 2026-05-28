@@ -11,6 +11,8 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>◈ AFL · 54235 · Roche Kaiseraugst</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0c0f;--bg2:#10131a;--bg3:#161b24;--bg4:#1c232f;--ac:#00d4ff;--ac2:#0098c8;--acd:rgba(0,212,255,.12);--gr:#00e87b;--gr2:#00a858;--grd:rgba(0,232,123,.12);--yw:#ffcc00;--ywd:rgba(255,204,0,.12);--rd:#ff3b3b;--rdd:rgba(255,59,59,.12);--pu:#a78bfa;--pud:rgba(167,139,250,.12);--t1:#e4eaf2;--t2:#7d93a8;--t3:#465568;--bd:#1a2230;--bd2:#243040;--fm:'JetBrains Mono',monospace;--fs:'IBM Plex Sans',sans-serif;--rad:10px}
@@ -429,6 +431,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="app">
   <div class="topbar">
     <div class="tb-brand">◈ AFL · 54235 · CIP/SIP</div>
+    <span id="fb-status" style="font-size:.5rem;font-family:var(--fm);padding:2px 5px;border-radius:4px;background:var(--grd);color:var(--gr);display:none">● LIVE</span>
+    <span id="fb-users" style="font-size:.55rem;font-family:var(--fm);color:var(--t3);display:none"></span>
     <div class="tb-user" id="tu"></div>
     <button class="btn-out" ontouchend="event.preventDefault();doLogout()" onclick="doLogout()">⏻</button>
   </div>
@@ -492,8 +496,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
           <div class="row"><label>Offene Punkte / Probleme</label><textarea id="uiss" placeholder="z.B. Druckabfall bei V1.2…"></textarea></div>
           <div class="row"><label>Besondere Vorkommnisse</label><textarea id="unts" placeholder="z.B. Verzögerung wegen…"></textarea></div>
           <button class="bgen" onclick="genRep()">Bericht generieren & speichern</button>
-          <button class="bexp" onclick="exportSync()">⬆ Sync-Code exportieren</button>
-          <button class="bexp" onclick="importSync()">⬇ Sync-Code importieren</button>
+          <div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:10px">
+            <div style="font-size:.65rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:6px">DATEN ÜBERTRAGEN</div>
+            <div style="display:flex;gap:6px">
+              <button class="bexp" onclick="exportFile()" style="flex:1">📥 Als Datei speichern</button>
+              <label class="bexp" style="flex:1;text-align:center;cursor:pointer">📤 Datei laden<input type="file" accept=".json" onchange="importFile(event)" style="display:none"></label>
+            </div>
+            <div style="font-size:.58rem;color:var(--t3);margin-top:4px">Überträgt Schritt-Status, Berichte und Kommentare auf ein anderes Gerät</div>
+          </div>
         </div>
         <div id="repout"></div>
       </div>
@@ -606,29 +616,114 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <script>
 const SK='afl54235v3';
 let ST={},U=null,CP=null,CS=null,tmI=null,tmS=0,tmP=0,tmR=false,pkT='A',cA=null,cB=null,hbI=null;
+let fbReady=false,fbUnsub=null;
+
+// Firebase init
+firebase.initializeApp({
+  apiKey:"AIzaSyD3vAlyKsPL5_KF3EpRqqaTTCpcnuE50Ww",
+  authDomain:"vials-afl.firebaseapp.com",
+  projectId:"vials-afl",
+  storageBucket:"vials-afl.firebasestorage.app",
+  messagingSenderId:"642752991118",
+  appId:"1:642752991118:web:95586c4f1b2a27d5495edf"
+});
+const db=firebase.firestore();
+const MACHINE='54235';
 
 function ld(){try{ST=JSON.parse(localStorage.getItem(SK)||'{}');}catch(e){ST={};}if(!ST.steps)ST.steps={};if(!ST.reports)ST.reports=[];if(!ST.user)ST.user=null;}
 function sv(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 
-// Sync functions
-async function syncPost(action,data){
-  try{await fetch('/api/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,user:U?.name||'?',data})});}catch(e){}}
-async function syncPull(){
-  try{const r=await fetch('/api/sync');const d=await r.json();
-    // Merge server steps into local (server wins for newer)
-    for(const[seq,ss]of Object.entries(d.steps||{})){
+// ═══ FIREBASE SYNC ═══
+async function fbSaveStep(seq,data){
+  if(!fbReady)return;
+  try{await db.collection('machines').doc(MACHINE).collection('steps').doc(String(seq)).set(data,{merge:true});}catch(e){console.warn('FB save step error',e);}
+}
+async function fbSaveReport(report){
+  if(!fbReady)return;
+  try{await db.collection('machines').doc(MACHINE).collection('reports').doc(String(report.id)).set(report);}catch(e){console.warn('FB save report error',e);}
+}
+async function fbSetUser(name,online){
+  if(!fbReady)return;
+  try{await db.collection('machines').doc(MACHINE).collection('users').doc(name).set({name,online,lastSeen:Date.now(),currentStep:CS,currentProg:CP},{merge:true});}catch(e){console.warn('FB user error',e);}
+}
+async function fbPullAll(){
+  if(!fbReady)return;
+  try{
+    // Pull steps
+    const snap=await db.collection('machines').doc(MACHINE).collection('steps').get();
+    let merged=0;
+    snap.forEach(doc=>{
+      const d=doc.data();const seq=doc.id;
       const local=ST.steps[seq];
-      if(!local||!local.statusTime||ss.time>local.statusTime){
-        ST.steps[seq]={status:ss.status,comment:ss.comment,statusTime:ss.time,statusUser:ss.user};
+      if(!local||!local.statusTime||d.statusTime>local.statusTime){
+        ST.steps[seq]=d;merged++;
       }
-    }
+    });
+    // Pull reports
+    const repSnap=await db.collection('machines').doc(MACHINE).collection('reports').get();
+    const ids=new Set(ST.reports.map(r=>String(r.id)));
+    repSnap.forEach(doc=>{if(!ids.has(doc.id)){ST.reports.push(doc.data());}});
     sv();
-  }catch(e){}}
+    if(merged>0)rSteps();
+  }catch(e){console.warn('FB pull error',e);}
+}
+function fbListen(){
+  if(!fbReady)return;
+  // Real-time step updates
+  fbUnsub=db.collection('machines').doc(MACHINE).collection('steps').onSnapshot(snap=>{
+    snap.docChanges().forEach(change=>{
+      if(change.type==='added'||change.type==='modified'){
+        const d=change.doc.data();const seq=change.doc.id;
+        const local=ST.steps[seq];
+        if(!local||!local.statusTime||d.statusTime>local.statusTime){
+          ST.steps[seq]=d;
+          // Push notification if someone else reported a problem
+          if(d.status==='problem'&&d.statusUser&&d.statusUser!==U?.name){
+            notify(`⚠ Problem bei Schritt ${seq}`,`${d.statusUser}: ${VSP.s?.[seq]?.n||seq}${d.comment?' — '+d.comment:''}`);
+          }
+          if(d.status==='done'&&d.statusUser&&d.statusUser!==U?.name){
+            // Subtle update, no notification
+          }
+          sv();rSteps();
+        }
+      }
+    });
+  });
+  // Real-time user presence
+  db.collection('machines').doc(MACHINE).collection('users').onSnapshot(snap=>{
+    let online=0,names=[];
+    snap.forEach(doc=>{const d=doc.data();if(d.online&&Date.now()-d.lastSeen<120000){online++;if(d.name!==U?.name)names.push(d.name);}});
+    const el=document.getElementById('fb-users');
+    if(el){el.textContent=names.length>0?`👥 ${names.join(', ')}`:'';el.style.display=names.length?'inline':'none';}
+  });
+}
 function startHeartbeat(){
   if(hbI)clearInterval(hbI);
-  hbI=setInterval(()=>syncPost('heartbeat',{currentStep:CS,currentProg:CP}),30000);
-  syncPost('heartbeat',{currentStep:CS,currentProg:CP});
+  hbI=setInterval(()=>fbSetUser(U?.name,true),30000);
+  fbSetUser(U?.name,true);
 }
+
+// ═══ PUSH NOTIFICATIONS ═══
+function requestNotify(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='default'){
+    Notification.requestPermission().then(p=>{
+      if(p==='granted')toast('🔔 Benachrichtigungen aktiviert');
+    });
+  }
+}
+function notify(title,body){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  try{
+    const n=new Notification(title,{body,icon:'icon-192.png',badge:'icon-192.png',tag:'afl-'+Date.now(),vibrate:[200,100,200]});
+    n.onclick=()=>{window.focus();n.close();};
+    setTimeout(()=>n.close(),8000);
+  }catch(e){}
+}
+
+// ═══ OLD SYNC COMPAT (no-op, replaced by Firebase) ═══
+async function syncPost(action,data){}
+async function syncPull(){}
 
 function doLogin(){
   const n=document.getElementById('iname').value.trim();
@@ -637,11 +732,13 @@ function doLogin(){
   document.getElementById('login').style.display='none';
   document.getElementById('app').classList.add('show');
   document.getElementById('tu').textContent=n;
-  syncPost('login');
-  syncPull().then(()=>init());
+  // Firebase
+  fbSetUser(n,true);
+  fbPullAll().then(()=>{init();fbListen();});
   startHeartbeat();
+  requestNotify();
 }
-function doLogout(){if(!confirm('Abmelden?'))return;syncPost('logout');if(hbI)clearInterval(hbI);U=null;document.getElementById('app').classList.remove('show');document.getElementById('login').style.display='flex';}
+function doLogout(){if(!confirm('Abmelden?'))return;fbSetUser(U?.name,false);if(fbUnsub)fbUnsub();if(hbI)clearInterval(hbI);U=null;document.getElementById('app').classList.remove('show');document.getElementById('login').style.display='flex';}
 
 function init(){rProgs();bUprog();rStats();}
 
@@ -970,8 +1067,8 @@ function openD(seq){
 }
 function closeD(){document.getElementById('dm').classList.remove('open');}
 function goSchema(){closeD();sw('f',document.querySelectorAll('.tab')[5]);}
-function setSt(st){if(!CS)return;if(!ST.steps[CS])ST.steps[CS]={};ST.steps[CS].status=st;ST.steps[CS].statusTime=Date.now();ST.steps[CS].statusUser=U?.name||'';sv();syncPost('step_update',{seq:CS,status:st,comment:ST.steps[CS].comment||'',program:CP?VSP.progs[CP]?.name:''});rSteps();closeD();toast(st==='done'?'✓ Erledigt':st==='skip'?'↷ Übersprungen':'⚠ Problem');}
-function saveCmt(){if(!CS)return;if(!ST.steps[CS])ST.steps[CS]={};ST.steps[CS].comment=document.getElementById('dcmt').value;sv();}
+function setSt(st){if(!CS)return;if(!ST.steps[CS])ST.steps[CS]={};ST.steps[CS].status=st;ST.steps[CS].statusTime=Date.now();ST.steps[CS].statusUser=U?.name||'';sv();fbSaveStep(CS,ST.steps[CS]);rSteps();closeD();toast(st==='done'?'✓ Erledigt':st==='skip'?'↷ Übersprungen':'⚠ Problem');}
+function saveCmt(){if(!CS)return;if(!ST.steps[CS])ST.steps[CS]={};ST.steps[CS].comment=document.getElementById('dcmt').value;sv();fbSaveStep(CS,ST.steps[CS]);}
 
 // Timer
 function openTm(){if(!CS)return;const s=VSP.s[String(CS)];document.getElementById('tmnm').textContent=s?.n||'';document.getElementById('tmtg').textContent='';tmR=false;tmS=0;tmP=0;document.getElementById('tmdc').textContent='00:00';document.getElementById('tmbtn').textContent='Start';document.getElementById('tmbtn').className='tb2 tb2s';document.getElementById('tm').classList.add('open');}
@@ -1124,7 +1221,7 @@ function genRep(){
   // Save to archive
   if(!ST.reports)ST.reports=[];
   ST.reports.push({id:Date.now(),ts:ts,user:U?.name||'?',prog:p?.name||'—',pid:pid,step:step,issues:iss,notes:nts,done:dn,total:ps.length,problems:pr,skipped:sk,text:r,problemSteps:ps.filter(s=>ST.steps[s]?.status==='problem')});
-  sv();
+  sv();fbSaveReport(ST.reports[ST.reports.length-1]);
   document.getElementById('repout').innerHTML=`<div class="rbox">${r.replace(/</g,'&lt;')}</div><button class="bexp" style="margin-top:6px" onclick="if(window._r)navigator.clipboard?.writeText(window._r).then(()=>toast('Kopiert!'))">Kopieren</button>`;
   window._r=r;toast('✓ Bericht gespeichert');
 }
@@ -1143,7 +1240,7 @@ function rArchive(){
 }
 function viewRep(id){const rep=ST.reports?.find(r=>r.id===id);if(!rep)return;document.getElementById('repout').innerHTML=`<div class="rbox">${rep.text.replace(/</g,'&lt;')}</div>`;window._r=rep.text;swRp('new',document.querySelectorAll('.rp-tab')[0]);toast('Bericht geladen');}
 function copyRep(id){const rep=ST.reports?.find(r=>r.id===id);if(!rep)return;navigator.clipboard?.writeText(rep.text).then(()=>toast('Kopiert!'));}
-function delRep(id){if(!confirm('Bericht endgültig löschen?'))return;ST.reports=ST.reports.filter(r=>r.id!==id);sv();rArchive();toast('Gelöscht');}
+function delRep(id){if(!confirm('Bericht endgültig löschen?'))return;ST.reports=ST.reports.filter(r=>r.id!==id);sv();if(fbReady)db.collection('machines').doc(MACHINE).collection('reports').doc(String(id)).delete().catch(()=>{});rArchive();toast('Gelöscht');}
 
 // Fehleranalyse
 function rErrors(){
@@ -1215,8 +1312,43 @@ function rErrors(){
   h+=`</div></div>`;
   c.innerHTML=h;
 }// end rErrors
-function exportSync(){const d={v:3,steps:ST.steps,reports:ST.reports||[],ts:Date.now(),user:U?.name||''};const code=btoa(unescape(encodeURIComponent(JSON.stringify(d))));navigator.clipboard?.writeText(code).then(()=>toast('Sync-Code kopiert!')).catch(()=>prompt('Sync-Code:',code));}
-function importSync(){const c=prompt('Sync-Code einfügen:');if(!c)return;try{const d=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));if(d.steps){ST.steps={...ST.steps,...d.steps};}if(d.reports){if(!ST.reports)ST.reports=[];const ids=new Set(ST.reports.map(r=>r.id));for(const r of d.reports){if(!ids.has(r.id))ST.reports.push(r);}}sv();rSteps();rStats();toast('✓ Sync OK');}catch(e){toast('Ungültiger Code');}}
+function exportFile(){
+  const d={
+    v:3,
+    app:'AFL 54235',
+    exported:new Date().toLocaleString('de-DE'),
+    user:U?.name||'',
+    steps:ST.steps,
+    reports:ST.reports||[],
+    ts:Date.now()
+  };
+  const json=JSON.stringify(d,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const ts=new Date().toISOString().slice(0,10);
+  a.href=url;a.download=`AFL-Backup_${U?.name||'export'}_${ts}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast('📥 Backup gespeichert');
+}
+function importFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(!d.steps&&!d.reports){toast('Ungültige Datei');return;}
+      const stepCount=d.steps?Object.keys(d.steps).length:0;
+      const repCount=d.reports?d.reports.length:0;
+      if(!confirm(`Backup laden?\n\n${stepCount} Schritt-Status\n${repCount} Berichte\n\nVon: ${d.user||'—'}\nDatum: ${d.exported||'—'}\n\nVorhandene Daten werden ergänzt.`))return;
+      if(d.steps){ST.steps={...ST.steps,...d.steps};}
+      if(d.reports){if(!ST.reports)ST.reports=[];const ids=new Set(ST.reports.map(r=>r.id));for(const r of d.reports){if(!ids.has(r.id))ST.reports.push(r);}}
+      sv();rSteps();toast(`✓ ${stepCount} Schritte + ${repCount} Berichte geladen`);
+    }catch(err){toast('Fehler beim Lesen der Datei');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
 
 // Stats
 function rStats(){const c=document.getElementById('stcont');const all=Object.values(ST.steps);const td=all.filter(s=>s.status==='done').length,tp=all.filter(s=>s.status==='problem').length,ts2=all.filter(s=>s.status==='skip').length;const pb={};for(const[seq,s]of Object.entries(ST.steps)){if(s.status!=='problem')continue;for(const[pid,p]of Object.entries(VSP.progs)){if(p.steps.includes(parseInt(seq))){pb[pid]=(pb[pid]||0)+1;break;}}}const mx=Math.max(1,...Object.values(pb));let pr='';for(const[pid,cnt]of Object.entries(pb).sort((a,b)=>b[1]-a[1]).slice(0,8)){const p=VSP.progs[pid];if(!p)continue;pr+=`<div class="sbrw"><div class="sblb" title="${p.name}">${p.name}</div><div class="sbtr"><div class="sbfl" style="width:${Math.round(cnt/mx*100)}%;background:var(--rd)"></div></div><div style="font-family:var(--fm);font-size:.68rem;color:var(--t3);min-width:20px;text-align:right">${cnt}</div></div>`;}c.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"><div class="scard"><div class="slbl">Erledigt</div><div class="sval" style="color:var(--gr)">${td}</div></div><div class="scard"><div class="slbl">Probleme</div><div class="sval" style="color:var(--rd)">${tp}</div></div><div class="scard"><div class="slbl">Übersprungen</div><div class="sval" style="color:var(--yw)">${ts2}</div></div><div class="scard"><div class="slbl">Gesamtschritte</div><div class="sval">${Object.keys(VSP.s).length}</div></div></div>${pr?`<div class="scard"><div class="slbl" style="margin-bottom:8px">Probleme nach Programm</div>${pr}</div>`:'<div class="empty">✓ Keine Probleme gemeldet.</div>'}`;}
@@ -1819,6 +1951,13 @@ async function aiSend(){
 
 // Boot
 ld();
+// Test Firebase connection
+db.collection('machines').doc(MACHINE).get().then(()=>{
+  fbReady=true;
+  const el=document.getElementById('fb-status');
+  if(el)el.style.display='inline';
+  console.log('Firebase connected');
+}).catch(e=>{console.warn('Firebase offline — using local only',e);});
 const _ri=document.getElementById('ri-img');
 if(_ri&&_ri.complete&&_ri.naturalHeight>0){fRiOk=true;}
 window.addEventListener('vsp-ready',()=>{
@@ -1827,7 +1966,9 @@ window.addEventListener('vsp-ready',()=>{
     U=ST.user;document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('show');
     document.getElementById('tu').textContent=U.name;
-    syncPost('login');syncPull().then(()=>init());startHeartbeat();
+    fbSetUser(U.name,true);
+    fbPullAll().then(()=>{init();fbListen();});
+    startHeartbeat();
   }else{document.getElementById('login').style.display='flex';}
 });
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
