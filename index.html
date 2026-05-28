@@ -191,6 +191,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .spib{font-size:.68rem;color:var(--t3)}
 
 /* Analyse / Compare */
+.a-tabs{display:flex;gap:0;margin-bottom:10px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--bd)}
+.a-tab{flex:1;padding:9px 4px;background:var(--bg2);border:none;color:var(--t3);font-size:.75rem;font-family:var(--fs);cursor:pointer;transition:all .15s;text-align:center}
+.a-tab.active{background:var(--ac);color:#000;font-weight:600}
+.a-panel{display:none}.a-panel.active{display:block}
+.a-search-wrap{position:sticky;top:0;z-index:5;background:var(--bg);padding-bottom:8px}
+.a-search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:.88rem;padding:10px 14px;outline:none;font-family:var(--fs);transition:border-color .2s}
+.a-search-wrap input:focus{border-color:var(--ac)}
+.a-sresults{max-height:180px;overflow-y:auto;margin-bottom:10px}
+.a-sitem{padding:8px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s;border-radius:6px;margin-bottom:2px}
+.a-sitem:hover,.a-sitem.sel{background:var(--bg3);border-color:var(--ac)}
+.a-sitem .a-snr{font-family:var(--fm);font-size:.65rem;color:var(--ac)}
+.a-sitem .a-sname{font-size:.82rem;color:var(--t1)}
+.a-sitem .a-sprog{font-size:.65rem;color:var(--t3)}
+.a-detail-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:12px;margin-bottom:8px}
+.a-detail-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.a-detail-nr{font-family:var(--fm);font-size:.72rem;color:var(--ac);font-weight:700}
+.a-detail-name{font-size:.92rem;font-weight:600;color:var(--t1);flex:1}
+.a-detail-prog{font-size:.65rem;color:var(--t3);font-family:var(--fm)}
+.a-vcard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad);padding:10px 12px;margin-bottom:6px}
+.a-vcard-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.a-vcard-name{font-family:var(--fm);font-size:.85rem;font-weight:700;color:var(--t1)}
+.a-vcard-desc{font-size:.72rem;color:var(--t2)}
+.a-vstep{display:inline-block;padding:3px 6px;margin:2px;border-radius:4px;font-family:var(--fm);font-size:.62rem;cursor:pointer;transition:all .12s;background:var(--bg3);border:1px solid var(--bd2);color:var(--t2)}
+.a-vstep:hover{border-color:var(--ac);color:var(--ac)}
 .apick{display:flex;gap:6px;margin-bottom:12px}
 .apb{flex:1;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:9px 10px;cursor:pointer;transition:border-color .15s}
 .apb:hover{border-color:var(--ac)}
@@ -289,6 +313,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .vi-sps{font-size:.58rem;color:var(--t3);margin-top:3px}
 .vi-close{position:absolute;top:4px;right:6px;color:var(--t3);font-size:.7rem;cursor:pointer;padding:2px 4px;line-height:1}
 .vi-close:hover{color:var(--t1)}
+.vi-actions{margin-top:6px;padding-top:6px;border-top:1px solid var(--bd2)}
+.vi-btn{width:100%;background:var(--acd);border:1px solid rgba(0,212,255,.2);border-radius:6px;color:var(--ac);font-size:.68rem;font-family:var(--fm);padding:6px 8px;cursor:pointer;transition:all .15s;text-align:center}
+.vi-btn:hover{background:rgba(0,212,255,.2);border-color:var(--ac)}
+
+/* Schema nav buttons */
+.f-nav{background:var(--bg3);border:1px solid var(--bd2);border-radius:6px;color:var(--t2);font-size:.78rem;padding:4px 10px;cursor:pointer;font-family:var(--fm);transition:all .15s;flex-shrink:0}
+.f-nav:hover{border-color:var(--ac);color:var(--ac)}
+.f-nav:active{background:var(--acd)}
 
 /* Report Archive */
 .rp-tabs{display:flex;gap:0;margin-bottom:10px;border-radius:var(--rad);overflow:hidden;border:1px solid var(--bd)}
@@ -413,12 +445,35 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
     </div>
     <!-- Analyse -->
     <div class="pane" id="pane-a">
-      <div class="sec">Ventil-Vergleich</div>
-      <div class="apick">
-        <div class="apb" onclick="openPicker('A')"><div class="apl">SCHRITT A</div><div class="apv" id="pav">— wählen —</div></div>
-        <div class="apb" onclick="openPicker('B')"><div class="apl">SCHRITT B</div><div class="apv" id="pbv">— wählen —</div></div>
+      <div class="a-tabs">
+        <button class="a-tab active" onclick="aTab('single',this)">Einzelschritt</button>
+        <button class="a-tab" onclick="aTab('compare',this)">Vergleich</button>
+        <button class="a-tab" onclick="aTab('ventil',this)">Ventilsuche</button>
       </div>
-      <div id="cres"></div>
+      <!-- Einzelschritt -->
+      <div class="a-panel active" id="ap-single">
+        <div class="a-search-wrap">
+          <input id="a-sinp" type="text" inputmode="text" autocomplete="off" placeholder="Schritt-Nr. oder Name eingeben…" oninput="aFilterSteps()">
+        </div>
+        <div id="a-sresults" class="a-sresults"></div>
+        <div id="a-sdetail"></div>
+      </div>
+      <!-- Vergleich -->
+      <div class="a-panel" id="ap-compare">
+        <div class="sec" style="margin-top:0">Ventil-Vergleich</div>
+        <div class="apick">
+          <div class="apb" onclick="openPicker('A')"><div class="apl">SCHRITT A</div><div class="apv" id="pav">— wählen —</div></div>
+          <div class="apb" onclick="openPicker('B')"><div class="apl">SCHRITT B</div><div class="apv" id="pbv">— wählen —</div></div>
+        </div>
+        <div id="cres"></div>
+      </div>
+      <!-- Ventilsuche -->
+      <div class="a-panel" id="ap-ventil">
+        <div class="a-search-wrap">
+          <input id="a-vinp" type="text" inputmode="text" autocomplete="off" placeholder="Ventil eingeben z.B. V14.8, SV7…" oninput="aFilterVentil()">
+        </div>
+        <div id="a-vresults"></div>
+      </div>
     </div>
     <!-- Übergabe -->
     <div class="pane" id="pane-u">
@@ -478,24 +533,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
     <!-- Schema / R&I -->
     <div class="pane" id="pane-f" style="padding:0">
       <div class="f-hdr">
-        <div class="f-hdr-t" id="f-lbl">◈ Schritt wählen</div>
+        <button onclick="flowPrev()" class="f-nav" id="f-prev" title="Vorheriger Schritt">◀</button>
+        <div class="f-hdr-t" id="f-lbl" onclick="openFlowPicker()" style="cursor:pointer">◈ Schritt wählen ▾</div>
+        <button onclick="flowNext()" class="f-nav" id="f-next" title="Nächster Schritt">▶</button>
         <div class="f-tools">
-          <button onclick="toggleVLabels()" id="f-lbl-btn" class="active">Labels</button>
-          <button onclick="openFlowPicker()">Schritt</button>
+          <button onclick="if(CS)openD(CS)" id="f-detail-btn" style="display:none">Detail</button>
+          <button onclick="openFlowPicker()">Suche</button>
         </div>
       </div>
       <div class="f-legend">
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:#00c853;box-shadow:0 0 4px rgba(0,200,83,.5)"></div>● Offen</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:#00b0ff;box-shadow:0 0 4px rgba(0,176,255,.5)"></div>⟳ Getaktet</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:#ff6d00;box-shadow:0 0 4px rgba(255,109,0,.5)"></div>◈ Druck</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:#ffd600;box-shadow:0 0 4px rgba(255,214,0,.5)"></div>⫸ Taktfolge</div>
-        <div class="f-legend-item"><div class="f-legend-dot" style="background:#b388ff;box-shadow:0 0 4px rgba(124,77,255,.5)"></div>◑ Bedingt</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#00c853;box-shadow:0 0 4px rgba(0,200,83,.5)"></div>Offen</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#00b0ff;box-shadow:0 0 4px rgba(0,176,255,.5)"></div>Getaktet</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#ff6d00;box-shadow:0 0 4px rgba(255,109,0,.5)"></div>Druck</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#ffd600;box-shadow:0 0 4px rgba(255,214,0,.5)"></div>Taktfolge</div>
+        <div class="f-legend-item"><div class="f-legend-dot" style="background:#b388ff;box-shadow:0 0 4px rgba(124,77,255,.5)"></div>Bedingt</div>
         <div class="f-legend-item"><div class="f-legend-dot" style="background:rgba(220,220,215,.55)"></div>Zu</div>
         <div class="f-legend-item" style="margin-left:auto;color:var(--ac)"><span id="f-vcnt"></span></div>
       </div>
       <div id="ri-wrap"><div id="ri-inner">
         <img id="ri-img" src="ri.webp" alt="R&I-Fließschema" onload="fRiOk=true;rFlowDots()" onerror="document.getElementById('f-lbl').textContent='⚠ Bild nicht geladen'">
-        <div id="v-info"><span class="vi-close" onclick="closeVInfo()">✕</span><div class="vi-head"><div class="vi-dot" id="vi-dot"></div><span class="vi-name" id="vi-name"></span><span class="vi-code" id="vi-code"></span></div><div id="vi-cat"></div><div class="vi-desc" id="vi-desc"></div><div class="vi-sps" id="vi-sps"></div></div>
+        <div id="v-info"><span class="vi-close" onclick="closeVInfo()">✕</span><div class="vi-head"><div class="vi-dot" id="vi-dot"></div><span class="vi-name" id="vi-name"></span><span class="vi-code" id="vi-code"></span></div><div id="vi-cat"></div><div class="vi-desc" id="vi-desc"></div><div class="vi-sps" id="vi-sps"></div><div class="vi-actions"><button onclick="if(CS)openD(CS)" class="vi-btn">📋 Schritt-Detail</button></div></div>
       </div></div>
     </div>
   </div>
@@ -930,6 +987,131 @@ function pkSt(seq){document.getElementById('sp').classList.remove('open');const 
 // Compare
 function rCmp(){const sA=VSP.s[cA],sB=VSP.s[cB];if(!sA||!sB)return;const mA=Object.fromEntries(sA.o),mB=Object.fromEntries(sB.o);const av=[...new Set([...Object.keys(mA),...Object.keys(mB)])].sort();let ca='',cb='',sm=0,df=0,oA=0,oB=0;for(const v of av){const a=mA[v],b=mB[v];if(a&&b){const c=a===b?'m':'d';if(a===b)sm++;else df++;ca+=`<div class="cv ${c}"><span>${v}</span><span>${a}</span></div>`;cb+=`<div class="cv ${c}"><span>${v}</span><span>${b}</span></div>`;}else if(a){oA++;ca+=`<div class="cv o"><span>${v}</span><span>${a}</span></div>`;cb+=`<div class="cv" style="opacity:.15"><span>${v}</span><span>—</span></div>`;}else{oB++;ca+=`<div class="cv" style="opacity:.15"><span>${v}</span><span>—</span></div>`;cb+=`<div class="cv o"><span>${v}</span><span>${b}</span></div>`;}}document.getElementById('cres').innerHTML=`<div style="font-size:.68rem;color:var(--t3);margin-bottom:6px;font-family:var(--fm)">✓ ${sm} gleich · ≠ ${df} verschieden · ◄ ${oA} nur A · ► ${oB} nur B</div><div class="cgrid"><div class="ccol"><div class="chdr">A · ${sA.n}</div>${ca}</div><div class="ccol"><div class="chdr">B · ${sB.n}</div>${cb}</div></div>`;}
 
+// Analyse Tabs
+function aTab(id,el){document.querySelectorAll('.a-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.a-tab').forEach(t=>t.classList.remove('active'));document.getElementById('ap-'+id).classList.add('active');el.classList.add('active');}
+
+// Einzelschritt-Suche
+function aFilterSteps(){
+  const q=document.getElementById('a-sinp').value.toLowerCase().trim();
+  const res=document.getElementById('a-sresults');
+  if(!q){res.innerHTML='<div style="padding:12px;color:var(--t3);font-size:.78rem;text-align:center">Schritt-Nummer oder Name eingeben</div>';document.getElementById('a-sdetail').innerHTML='';return;}
+  let h='',ct=0;
+  for(const[seq,s]of Object.entries(VSP.s)){
+    if(ct>30)break;
+    if(!seq.includes(q)&&!(s.n||'').toLowerCase().includes(q)&&!(s.b||'').toLowerCase().includes(q))continue;
+    ct++;
+    h+=`<div class="a-sitem" onclick="aSelectStep('${seq}')"><div class="a-snr">${seq}</div><div class="a-sname">${s.n||'—'}</div><div class="a-sprog">${s.b||''}</div></div>`;
+  }
+  res.innerHTML=ct?h:'<div style="padding:12px;color:var(--t3);font-size:.78rem;text-align:center">Keine Treffer</div>';
+}
+function aSelectStep(seq){
+  const s=VSP.s[seq];if(!s)return;
+  // Highlight selected
+  document.querySelectorAll('.a-sitem').forEach(el=>el.classList.remove('sel'));
+  event?.target?.closest?.('.a-sitem')?.classList?.add?.('sel');
+  const tDesc=(c)=>{if(!c||c==='X'||c==='x')return'Dauerhaft offen';return VSP.td?.[c]||c;};
+  const totalV=s.o.length;
+  const openV=s.o.filter(([v,c])=>c==='X'||c==='x').length;
+  const taktV=totalV-openV;
+  const usedCodes=[...new Set(s.o.map(([v,c])=>c).filter(c=>c!=='X'&&c!=='x'))];
+  // Schrittzeit
+  const zeitVal=s.fw?.FW1||'0';
+  const zeitSek=parseInt(zeitVal);
+  const zeitStr=zeitSek>0?(zeitSek>=60?Math.floor(zeitSek/60)+'m '+(zeitSek%60?zeitSek%60+'s':''):zeitSek+'s'):'—';
+
+  let h=`<div class="a-detail-card"><div class="a-detail-hdr"><span class="a-detail-nr">${seq}</span><span class="a-detail-name">${s.n||'—'}</span></div><div class="a-detail-prog">${s.b||''}</div>`;
+  // Kommentar
+  if(s.km)h+=`<div style="margin-top:6px;padding:6px 8px;background:var(--ywd);border-radius:6px;border-left:3px solid var(--yw);font-size:.72rem;color:var(--t1)">💡 ${s.km}</div>`;
+  // Stats
+  h+=`<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">`;
+  h+=`<div style="background:var(--bg3);border-radius:6px;padding:6px 10px;flex:1;min-width:70px"><div style="font-size:.55rem;color:var(--t3);font-family:var(--fm)">VENTILE</div><div style="font-size:1rem;font-weight:700;font-family:var(--fm);color:var(--t1)">${totalV}</div><div style="font-size:.55rem;color:var(--t3)">${openV} offen · ${taktV} gesteuert</div></div>`;
+  h+=`<div style="background:var(--bg3);border-radius:6px;padding:6px 10px;flex:1;min-width:70px"><div style="font-size:.55rem;color:var(--t3);font-family:var(--fm)">SCHRITTZEIT</div><div style="font-size:1rem;font-weight:700;font-family:var(--fm);color:var(--ac)">${zeitStr}</div></div>`;
+  h+=`<div style="background:var(--bg3);border-radius:6px;padding:6px 10px;flex:1;min-width:70px"><div style="font-size:.55rem;color:var(--t3);font-family:var(--fm)">TAKTCODES</div><div style="font-size:1rem;font-weight:700;font-family:var(--fm);color:var(--yw)">${usedCodes.length}</div></div>`;
+  h+=`</div>`;
+  // Prozessparameter
+  if(s.fw){
+    const entries=Object.entries(s.fw).filter(([k,v])=>v!=='0'&&k!=='FW1'&&!k.match(/FW2[3-9]|FW3[0-2]/));
+    if(entries.length>0){
+      h+=`<div style="margin-top:8px"><div style="font-size:.58rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:4px">PROZESSPARAMETER</div><div style="display:flex;flex-wrap:wrap;gap:4px">`;
+      for(const[fid,fval]of entries){
+        h+=`<div style="background:var(--bg3);border-radius:4px;padding:3px 8px;font-family:var(--fm);font-size:.68rem"><span style="color:var(--t3)">${fwShort(fid)}</span> <span style="color:var(--t1);font-weight:600">${fmtFW(fid,fval)}</span></div>`;
+      }
+      h+=`</div></div>`;
+    }
+  }
+  // Taktcodes
+  if(usedCodes.length>0){
+    h+=`<div style="margin-top:8px"><div style="font-size:.58rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:4px">VENTILTAKTUNGEN</div>`;
+    for(const code of usedCodes.sort()){
+      const td=VSP.td?.[code]||code;
+      const cls=vcls(code);
+      h+=`<div style="display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid var(--bd)"><span class="vc ${cls}" style="margin:0;flex-shrink:0">${code}</span><span style="font-size:.72rem;color:var(--t2);line-height:1.4">${td}</span></div>`;
+    }
+    h+=`</div>`;
+  }
+  // Ventile grouped
+  const grp={};
+  for(const[v,c]of s.o){const g=VSP.vi[v]?.g||'Sonstige';if(!grp[g])grp[g]=[];grp[g].push([v,c]);}
+  h+=`<div style="margin-top:8px"><div style="font-size:.58rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:4px">ALLE VENTILE</div>`;
+  for(const[g,valves]of Object.entries(grp)){
+    h+=`<div style="margin-bottom:6px"><div style="font-size:.62rem;color:var(--t3);font-family:var(--fm);margin-bottom:3px">${g} (${valves.length})</div><div style="display:flex;flex-wrap:wrap;gap:3px">`;
+    for(const[v,c]of valves){
+      const td=tDesc(c);
+      const cls=vcls(c);
+      h+=`<div class="vc ${cls}" onclick="toast('${v}: ${c} → ${td.replace(/'/g,"\\\\'")}')" style="cursor:pointer"><span>${v}</span> <span style="font-size:.55rem;opacity:.7">${c}</span></div>`;
+    }
+    h+=`</div></div>`;
+  }
+  h+=`</div>`;
+  // Actions
+  h+=`<div style="display:flex;gap:6px;margin-top:10px">`;
+  h+=`<button style="flex:1;padding:8px;background:var(--acd);border:1px solid rgba(0,212,255,.2);border-radius:8px;color:var(--ac);font-size:.78rem;cursor:pointer;font-family:var(--fm)" onclick="CS=${seq};openD(${seq})">📋 Vollansicht</button>`;
+  h+=`<button style="flex:1;padding:8px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--t2);font-size:.78rem;cursor:pointer;font-family:var(--fm)" onclick="CS=${seq};sw('f',document.querySelectorAll('.tab')[5]);rFlowDots()">◈ Im Schema</button>`;
+  h+=`</div></div>`;
+  document.getElementById('a-sdetail').innerHTML=h;
+}
+
+// Ventilsuche — wo wird ein bestimmtes Ventil verwendet
+function aFilterVentil(){
+  const q=document.getElementById('a-vinp').value.toUpperCase().trim();
+  const res=document.getElementById('a-vresults');
+  if(!q){res.innerHTML='<div style="padding:12px;color:var(--t3);font-size:.78rem;text-align:center">Ventilnummer eingeben (z.B. V14.8, SV7)</div>';return;}
+  // Find all matching valves
+  const matches=[];
+  const allValves=new Set();
+  for(const[seq,s]of Object.entries(VSP.s)){for(const[v]of s.o)allValves.add(v);}
+  for(const v of [...allValves].sort()){if(!v.toUpperCase().includes(q))continue;matches.push(v);}
+  if(!matches.length){res.innerHTML='<div style="padding:12px;color:var(--t3);font-size:.78rem;text-align:center">Kein Ventil gefunden</div>';return;}
+  let h='';
+  for(const valve of matches.slice(0,10)){
+    const vi=VSP.vi?.[valve]||{};
+    // Find all steps using this valve
+    const steps=[];
+    for(const[seq,s]of Object.entries(VSP.s)){
+      const match=s.o.find(([v])=>v===valve);
+      if(match)steps.push({seq,name:s.n,code:match[1],prog:s.b});
+    }
+    // Group by program
+    const byProg={};
+    for(const st of steps){const p=st.prog||'Sonstige';if(!byProg[p])byProg[p]=[];byProg[p].push(st);}
+    h+=`<div class="a-vcard"><div class="a-vcard-hdr"><span class="a-vcard-name">${valve}</span>${vi.a?`<span style="font-family:var(--fm);font-size:.6rem;color:var(--t3)">${vi.a}</span>`:''}</div>`;
+    if(vi.d)h+=`<div class="a-vcard-desc">${vi.d}</div>`;
+    if(vi.g)h+=`<div style="font-size:.6rem;color:var(--t3);margin-bottom:4px">Gruppe: ${vi.g}</div>`;
+    h+=`<div style="font-size:.65rem;color:var(--ac);font-family:var(--fm);margin-bottom:4px">Verwendet in ${steps.length} Schritten</div>`;
+    for(const[prog,pSteps]of Object.entries(byProg)){
+      h+=`<div style="margin-bottom:4px"><div style="font-size:.58rem;color:var(--t3);font-family:var(--fm);margin-bottom:2px">${prog} (${pSteps.length})</div><div style="display:flex;flex-wrap:wrap;gap:2px">`;
+      for(const st of pSteps){
+        const cls=vcls(st.code);
+        h+=`<span class="a-vstep ${cls}" onclick="aSelectStepFromVentil('${st.seq}')" title="${st.name}: ${st.code}">${st.seq}</span>`;
+      }
+      h+=`</div></div>`;
+    }
+    h+=`</div>`;
+  }
+  res.innerHTML=h;
+}
+function aSelectStepFromVentil(seq){aTab('single',document.querySelectorAll('.a-tab')[0]);document.getElementById('a-sinp').value=seq;aFilterSteps();setTimeout(()=>aSelectStep(seq),100);}
+
 // Übergabe
 function swRp(id,el){document.querySelectorAll('.rp-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.rp-tab').forEach(t=>t.classList.remove('active'));document.getElementById('rp-'+id).classList.add('active');el.classList.add('active');if(id==='archive')rArchive();if(id==='errors')rErrors();if(id==='stats'){rStats();rChangelog();}}
 function bUprog(){const s=document.getElementById('uprog');s.innerHTML='<option value="">— wählen —</option>';for(const[pid,p]of Object.entries(VSP.progs)){const o=document.createElement('option');o.value=pid;o.textContent=`${pid}: ${p.name}`;s.appendChild(o);}}
@@ -1060,8 +1242,14 @@ function rFlowDots(){
   closeVInfo();
   const lbl=document.getElementById('f-lbl');
   let vm={},activeCount=0;
-  if(CS&&VSP&&VSP.s[String(CS)]){const s=VSP.s[String(CS)];vm=Object.fromEntries(s.o);lbl.textContent=`${CS}: ${s.n||'—'} · ${s.b||''}`;}
-  else{lbl.textContent='◈ Schritt wählen';}
+  if(CS&&VSP&&VSP.s[String(CS)]){
+    const s=VSP.s[String(CS)];vm=Object.fromEntries(s.o);
+    let posText='';
+    if(CP&&VSP.progs[CP]){const steps=VSP.progs[CP].steps;const idx=steps.indexOf(CS);if(idx>=0)posText=` · ${idx+1}/${steps.length}`;}
+    lbl.textContent=`${CS}: ${s.n||'—'}${posText}`;
+    document.getElementById('f-detail-btn').style.display='inline-block';
+  }
+  else{lbl.textContent='◈ Schritt wählen ▾';document.getElementById('f-detail-btn').style.display='none';}
   const total=Object.keys(VP).length;
   const vCat=(code)=>{
     if(!code)return'cl';
@@ -1112,7 +1300,21 @@ function showVInfo(nm,val,cat,xp,yp){
   info.className='show';
 }
 function closeVInfo(){const info=document.getElementById('v-info');if(info)info.className='';}
-function toggleVLabels(){labelsOn=!labelsOn;document.getElementById('f-lbl-btn').classList.toggle('active',labelsOn);rFlowDots();}
+function flowPrev(){
+  if(!CP||!VSP.progs[CP])return;
+  const steps=VSP.progs[CP].steps;
+  if(!CS){CS=steps[0];rFlowDots();return;}
+  const idx=steps.indexOf(CS);
+  if(idx>0){CS=steps[idx-1];rFlowDots();}
+}
+function flowNext(){
+  if(!CP||!VSP.progs[CP])return;
+  const steps=VSP.progs[CP].steps;
+  if(!CS){CS=steps[0];rFlowDots();return;}
+  const idx=steps.indexOf(CS);
+  if(idx<steps.length-1){CS=steps[idx+1];rFlowDots();}
+}
+function toggleVLabels(){labelsOn=!labelsOn;rFlowDots();}
 function openFlowPicker(){pkT='F';document.getElementById('spinp').value='';bkPl('');document.getElementById('sp').classList.add('open');document.getElementById('spinp').focus();}
 
 // Toast
