@@ -502,7 +502,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
               <button class="bexp" onclick="exportFile()" style="flex:1">📥 Als Datei speichern</button>
               <label class="bexp" style="flex:1;text-align:center;cursor:pointer">📤 Datei laden<input type="file" accept=".json" onchange="importFile(event)" style="display:none"></label>
             </div>
-            <div style="font-size:.58rem;color:var(--t3);margin-top:4px">Überträgt Schritt-Status, Berichte und Kommentare auf ein anderes Gerät</div>
+            <div style="font-size:.58rem;color:var(--t3);margin-top:4px">Überträgt Berichte und Kommentare auf ein anderes Gerät</div>
+          </div>
+          <div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:10px">
+            <div style="font-size:.65rem;color:var(--t3);font-family:var(--fm);letter-spacing:.5px;margin-bottom:6px">HISTORIE VERWALTEN</div>
+            <div style="display:flex;gap:6px">
+              <button class="bexp" onclick="clearStepStatus()" style="flex:1;border-color:var(--rd)">🗑 Schritt-Status zurücksetzen</button>
+              <button class="bexp" onclick="clearAllData()" style="flex:1;border-color:var(--rd)">⚠ Alle Daten löschen</button>
+            </div>
+            <div style="font-size:.58rem;color:var(--t3);margin-top:4px">Löscht lokale Daten. Firebase-Daten bleiben erhalten.</div>
           </div>
         </div>
         <div id="repout"></div>
@@ -1008,27 +1016,49 @@ function openD(seq){
   }
 
   // Kommentar from Excel
-  if(s.km)html+=`<div class="dkm">💡 ${s.km}</div>`;
+  if(s.km)html+=`<div style="margin:8px 16px;padding:8px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:8px;border-left:3px solid var(--ac)"><div style="font-size:.58rem;color:var(--ac);font-family:var(--fm);font-weight:700;margin-bottom:3px;letter-spacing:.5px">⚡ WEITERSCHALTBEDINGUNG</div><div style="font-size:.78rem;color:var(--t1);line-height:1.5">${s.km}</div></div>`;
 
   // Formatwerte (process parameters)
   if(s.fw){
     const entries=Object.entries(s.fw).filter(([k,v])=>v!=='0'&&!k.match(/FW2[3-9]|FW3[0-2]/));
     if(entries.length>0){
-      const order={time:0,press:1,temp:2,cond:3,ctrl:4};
+      const order={time:0,temp:1,press:2,cond:3,ctrl:4};
       entries.sort((a,b)=>(order[fwType(a[0])]||5)-(order[fwType(b[0])]||5));
       const zeitEntry=entries.find(([k])=>k==='FW1');
-      const rest=entries.filter(([k])=>k!=='FW1');
+      const tempEntries=entries.filter(([k])=>fwType(k)==='temp');
+      const pressEntries=entries.filter(([k])=>fwType(k)==='press');
+      const condEntries=entries.filter(([k])=>fwType(k)==='cond');
+      const ctrlEntries=entries.filter(([k])=>fwType(k)==='ctrl');
       html+=`<div class="fwsec"><div class="fwtitle">Prozessparameter</div>`;
+      // Schrittzeit
       if(zeitEntry){
         html+=`<div class="fwgrid single"><div class="fwcard time"><div class="fwlbl">⏱ ${fwShort('FW1')}</div><div class="fwval" style="font-size:1.1rem">${fmtFW('FW1',zeitEntry[1])}</div></div></div>`;
       }
-      if(rest.length>0){
+      // Temperatur — prominent section
+      if(tempEntries.length>0){
+        html+=`<div style="margin-top:6px;padding:8px 10px;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);border-radius:8px;border-left:3px solid #ff6b35"><div style="font-size:.6rem;color:#ff6b35;font-family:var(--fm);font-weight:700;margin-bottom:5px;letter-spacing:.5px">🌡 TEMPERATURANFORDERUNGEN</div>`;
         html+=`<div class="fwgrid">`;
-        for(const[fid,fval]of rest){
+        for(const[fid,fval]of tempEntries){
+          html+=`<div class="fwcard temp"><div class="fwlbl">🌡 ${fwShort(fid)}</div><div class="fwval" style="color:#ff6b35;font-size:.95rem">${fmtFW(fid,fval)}</div></div>`;
+        }
+        html+=`</div></div>`;
+      }
+      // Druck
+      if(pressEntries.length>0){
+        html+=`<div style="margin-top:6px"><div style="font-size:.58rem;color:var(--ac);font-family:var(--fm);font-weight:600;margin-bottom:3px;letter-spacing:.3px">◉ DRUCKWERTE</div><div class="fwgrid">`;
+        for(const[fid,fval]of pressEntries){
+          html+=`<div class="fwcard press"><div class="fwlbl">◉ ${fwShort(fid)}</div><div class="fwval" style="color:var(--ac)">${fmtFW(fid,fval)}</div></div>`;
+        }
+        html+=`</div></div>`;
+      }
+      // Leitfähigkeit + Sonstige
+      const otherEntries=[...condEntries,...ctrlEntries];
+      if(otherEntries.length>0){
+        html+=`<div class="fwgrid" style="margin-top:4px">`;
+        for(const[fid,fval]of otherEntries){
           const tp=fwType(fid);
-          const icon=tp==='press'?'◉':tp==='temp'?'🌡':tp==='cond'?'⚡':'⚙';
-          const valColor=tp==='temp'?'color:#ff6b35':tp==='press'?'color:var(--ac)':tp==='cond'?'color:var(--yw)':'';
-          html+=`<div class="fwcard ${tp}"><div class="fwlbl">${icon} ${fwShort(fid)}</div><div class="fwval" style="${valColor}">${fmtFW(fid,fval)}</div></div>`;
+          const icon=tp==='cond'?'⚡':'⚙';
+          html+=`<div class="fwcard ${tp}"><div class="fwlbl">${icon} ${fwShort(fid)}</div><div class="fwval" style="${tp==='cond'?'color:var(--yw)':''}">${fmtFW(fid,fval)}</div></div>`;
         }
         html+=`</div>`;
       }
@@ -1348,6 +1378,17 @@ function importFile(e){
   };
   reader.readAsText(file);
   e.target.value='';
+}
+function clearStepStatus(){
+  const cnt=Object.keys(ST.steps).length;
+  if(!cnt){toast('Keine Schritt-Daten vorhanden');return;}
+  if(!confirm(`${cnt} Schritt-Status (erledigt/problem/übersprungen) und Kommentare löschen?\n\nBerichte bleiben erhalten.`))return;
+  ST.steps={};sv();rSteps();rStats();toast('✓ Schritt-Status gelöscht');
+}
+function clearAllData(){
+  if(!confirm('ALLE lokalen Daten löschen?\n\n• Schritt-Status\n• Berichte\n• Kommentare\n\nDas kann nicht rückgängig gemacht werden!'))return;
+  if(!confirm('Wirklich alles löschen?'))return;
+  ST={steps:{},reports:[]};sv();rSteps();rStats();rArchive();toast('✓ Alle Daten gelöscht');
 }
 
 // Stats
