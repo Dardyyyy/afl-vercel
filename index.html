@@ -11,8 +11,8 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>◈ AFL · 54235 · Roche Kaiseraugst</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" onerror="window._fbFail=true"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" onerror="window._fbFail=true"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0c0f;--bg2:#10131a;--bg3:#161b24;--bg4:#1c232f;--ac:#00d4ff;--ac2:#0098c8;--acd:rgba(0,212,255,.12);--gr:#00e87b;--gr2:#00a858;--grd:rgba(0,232,123,.12);--yw:#ffcc00;--ywd:rgba(255,204,0,.12);--rd:#ff3b3b;--rdd:rgba(255,59,59,.12);--pu:#a78bfa;--pud:rgba(167,139,250,.12);--t1:#e4eaf2;--t2:#7d93a8;--t3:#465568;--bd:#1a2230;--bd2:#243040;--fm:'JetBrains Mono',monospace;--fs:'IBM Plex Sans',sans-serif;--rad:10px}
@@ -629,17 +629,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 const SK='afl54235v3';
 let ST={},U=null,CP=null,CS=null,tmI=null,tmS=0,tmP=0,tmR=false,pkT='A',cA=null,cB=null,hbI=null;
 let fbReady=false,fbUnsub=null;
+let db=null;
 
-// Firebase init
-firebase.initializeApp({
-  apiKey:"AIzaSyD3vAlyKsPL5_KF3EpRqqaTTCpcnuE50Ww",
-  authDomain:"vials-afl.firebaseapp.com",
-  projectId:"vials-afl",
-  storageBucket:"vials-afl.firebasestorage.app",
-  messagingSenderId:"642752991118",
-  appId:"1:642752991118:web:95586c4f1b2a27d5495edf"
-});
-const db=firebase.firestore();
+// Firebase init — app works without it
+try{
+  if(!window._fbFail&&typeof firebase!=='undefined'){
+    firebase.initializeApp({apiKey:"AIzaSyD3vAlyKsPL5_KF3EpRqqaTTCpcnuE50Ww",authDomain:"vials-afl.firebaseapp.com",projectId:"vials-afl",storageBucket:"vials-afl.firebasestorage.app",messagingSenderId:"642752991118",appId:"1:642752991118:web:95586c4f1b2a27d5495edf"});
+    db=firebase.firestore();
+  }
+}catch(e){console.warn('Firebase init failed',e);}
 const MACHINE='54235';
 
 function ld(){try{ST=JSON.parse(localStorage.getItem(SK)||'{}');}catch(e){ST={};}if(!ST.steps)ST.steps={};if(!ST.reports)ST.reports=[];if(!ST.user)ST.user=null;}
@@ -647,19 +645,19 @@ function sv(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 
 // ═══ FIREBASE SYNC ═══
 async function fbSaveStep(seq,data){
-  if(!fbReady)return;
+  if(!fbReady||!db)return;
   try{await db.collection('machines').doc(MACHINE).collection('steps').doc(String(seq)).set(data,{merge:true});}catch(e){console.warn('FB save step error',e);}
 }
 async function fbSaveReport(report){
-  if(!fbReady)return;
+  if(!fbReady||!db)return;
   try{await db.collection('machines').doc(MACHINE).collection('reports').doc(String(report.id)).set(report);}catch(e){console.warn('FB save report error',e);}
 }
 async function fbSetUser(name,online){
-  if(!fbReady)return;
+  if(!fbReady||!db)return;
   try{await db.collection('machines').doc(MACHINE).collection('users').doc(name).set({name,online,lastSeen:Date.now(),currentStep:CS,currentProg:CP},{merge:true});}catch(e){console.warn('FB user error',e);}
 }
 async function fbPullAll(){
-  if(!fbReady)return;
+  if(!fbReady||!db)return;
   try{
     // Pull steps
     const snap=await db.collection('machines').doc(MACHINE).collection('steps').get();
@@ -680,7 +678,7 @@ async function fbPullAll(){
   }catch(e){console.warn('FB pull error',e);}
 }
 function fbListen(){
-  if(!fbReady)return;
+  if(!fbReady||!db)return;
   // Real-time step updates
   fbUnsub=db.collection('machines').doc(MACHINE).collection('steps').onSnapshot(snap=>{
     snap.docChanges().forEach(change=>{
@@ -1440,7 +1438,7 @@ function clearStepStatus(){
   if(!cnt){toast('Keine Schritt-Daten vorhanden');return;}
   if(!confirm(`${cnt} Schritt-Status und Kommentare löschen?\n\nBerichte bleiben erhalten.`))return;
   // Also clear from Firebase
-  if(fbReady){
+  if(fbReady&&db){
     db.collection('machines').doc(MACHINE).collection('steps').get().then(snap=>{
       const batch=db.batch();
       snap.forEach(doc=>batch.delete(doc.ref));
@@ -1452,7 +1450,7 @@ function clearStepStatus(){
 function clearAllData(){
   if(!confirm('ALLE Daten löschen?\n\n• Schritt-Status\n• Berichte\n• Kommentare\n\nAuch aus Firebase!'))return;
   if(!confirm('Wirklich alles löschen?'))return;
-  if(fbReady){
+  if(fbReady&&db){
     // Clear steps
     db.collection('machines').doc(MACHINE).collection('steps').get().then(snap=>{const b=db.batch();snap.forEach(d=>b.delete(d.ref));return b.commit();}).catch(()=>{});
     // Clear reports
@@ -2063,12 +2061,14 @@ async function aiSend(){
 // Boot
 ld();
 // Test Firebase connection
-db.collection('machines').doc(MACHINE).get().then(()=>{
-  fbReady=true;
-  const el=document.getElementById('fb-status');
-  if(el)el.style.display='inline';
-  console.log('Firebase connected');
-}).catch(e=>{console.warn('Firebase offline — using local only',e);});
+if(db){
+  db.collection('machines').doc(MACHINE).get().then(()=>{
+    fbReady=true;
+    const el=document.getElementById('fb-status');
+    if(el)el.style.display='inline';
+    console.log('Firebase connected');
+  }).catch(e=>{console.warn('Firebase offline — using local only',e);});
+}else{console.log('Firebase SDK not available — local mode');}
 const _ri=document.getElementById('ri-img');
 if(_ri&&_ri.complete&&_ri.naturalHeight>0){fRiOk=true;}
 window.addEventListener('vsp-ready',()=>{
