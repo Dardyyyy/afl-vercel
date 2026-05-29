@@ -526,6 +526,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <!-- Stats -->
       <div class="rp-panel" id="rp-stats">
         <div id="stcont"></div>
+        <div style="display:flex;gap:6px;margin:10px 0">
+          <button class="bexp" onclick="clearStepStatus()" style="flex:1;border-color:var(--rd);font-size:.72rem">🗑 Status zurücksetzen</button>
+          <button class="bexp" onclick="clearAllData()" style="flex:1;border-color:var(--rd);font-size:.72rem">⚠ Alles löschen</button>
+        </div>
         <div class="sec" style="margin-top:12px">Änderungshistorie · V20</div>
         <div id="clcont" style="margin-bottom:12px"></div>
       </div>
@@ -974,6 +978,39 @@ function openD(seq){
 
   html+=`</div>`; // sa-wrap END
 
+  // ═══ PROCESS CONTEXT ═══
+  if(VSP.ctx){
+    const stepValves=new Set(s.o.map(([v])=>v));
+    const matches=[];
+    for(const[eqId,eq]of Object.entries(VSP.ctx)){
+      const hasValve=eq.valves.some(v=>stepValves.has(v));
+      if(!hasValve&&eqId!=='PT_SYSTEM')continue;
+      for(const note of eq.notes){
+        if(note.trigger.includes(String(seq))||note.trigger.includes('*')){
+          matches.push({eq:eq.name,desc:eq.desc,text:note.text,temp:note.temp,medium:note.medium,eqId});
+        }
+      }
+    }
+    if(matches.length>0){
+      const specific=matches.filter(m=>m.eqId!=='PT_SYSTEM');
+      const show=specific.length>0?specific:matches;
+      html+=`<div style="margin:8px 16px"><div style="font-size:.58rem;color:var(--pu);font-family:var(--fm);font-weight:700;letter-spacing:.5px;margin-bottom:6px">🔗 PROZESSKONTEXT</div>`;
+      for(const m of show){
+        html+=`<div style="padding:8px 10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);border-radius:8px;border-left:3px solid var(--pu);margin-bottom:6px">`;
+        html+=`<div style="font-size:.72rem;font-weight:700;color:var(--pu);margin-bottom:3px">${m.eq}</div>`;
+        if(m.temp||m.medium){
+          html+=`<div style="display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap">`;
+          if(m.temp)html+=`<span style="font-family:var(--fm);font-size:.75rem;font-weight:700;color:#ff6b35;background:rgba(255,107,53,.1);padding:2px 8px;border-radius:4px">🌡 ${m.temp}</span>`;
+          if(m.medium)html+=`<span style="font-family:var(--fm);font-size:.68rem;color:var(--ac);background:var(--acd);padding:2px 8px;border-radius:4px">💧 ${m.medium}</span>`;
+          html+=`</div>`;
+        }
+        html+=`<div style="font-size:.72rem;color:var(--t2);line-height:1.4">${m.text}</div>`;
+        html+=`</div>`;
+      }
+      html+=`</div>`;
+    }
+  }
+
   // DIFF to previous step
   if(CP&&VSP.progs[CP]){
     const steps=VSP.progs[CP].steps;
@@ -1016,7 +1053,26 @@ function openD(seq){
   }
 
   // Kommentar from Excel
-  if(s.km)html+=`<div style="margin:8px 16px;padding:8px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:8px;border-left:3px solid var(--ac)"><div style="font-size:.58rem;color:var(--ac);font-family:var(--fm);font-weight:700;margin-bottom:3px;letter-spacing:.5px">⚡ WEITERSCHALTBEDINGUNG</div><div style="font-size:.78rem;color:var(--t1);line-height:1.5">${s.km}</div></div>`;
+  if(s.km){
+    // Auto-link X-codes in km text
+    let kmHtml=s.km.replace(/</g,'&lt;');
+    kmHtml=kmHtml.replace(/\b(X\d+N?[A-B]?)\b/g,(match)=>{
+      const td=VSP.td?.[match];
+      if(td)return`<span style="color:var(--ac);font-weight:600;cursor:pointer;border-bottom:1px dashed var(--ac)" onclick="toast('${match}: ${td.replace(/'/g,"\\\\'")}')">${match}</span>`;
+      return match;
+    });
+    html+=`<div style="margin:8px 16px;padding:8px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:8px;border-left:3px solid var(--ac)"><div style="font-size:.58rem;color:var(--ac);font-family:var(--fm);font-weight:700;margin-bottom:3px;letter-spacing:.5px">⚡ WEITERSCHALTBEDINGUNG</div><div style="font-size:.78rem;color:var(--t1);line-height:1.5">${kmHtml}</div>`;
+    // If km references X-codes, show their descriptions below
+    const refs=[...s.km.matchAll(/\b(X\d+N?[A-B]?)\b/g)].map(m=>m[1]).filter(c=>VSP.td?.[c]);
+    if(refs.length>0){
+      html+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,212,255,.1)">`;
+      for(const code of [...new Set(refs)]){
+        html+=`<div style="display:flex;gap:6px;align-items:flex-start;padding:2px 0"><span style="font-family:var(--fm);font-size:.68rem;font-weight:700;color:var(--ac);min-width:28px">${code}</span><span style="font-size:.68rem;color:var(--t2);line-height:1.3">${VSP.td[code]}</span></div>`;
+      }
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  }
 
   // Formatwerte (process parameters)
   if(s.fw){
@@ -1382,12 +1438,26 @@ function importFile(e){
 function clearStepStatus(){
   const cnt=Object.keys(ST.steps).length;
   if(!cnt){toast('Keine Schritt-Daten vorhanden');return;}
-  if(!confirm(`${cnt} Schritt-Status (erledigt/problem/übersprungen) und Kommentare löschen?\n\nBerichte bleiben erhalten.`))return;
+  if(!confirm(`${cnt} Schritt-Status und Kommentare löschen?\n\nBerichte bleiben erhalten.`))return;
+  // Also clear from Firebase
+  if(fbReady){
+    db.collection('machines').doc(MACHINE).collection('steps').get().then(snap=>{
+      const batch=db.batch();
+      snap.forEach(doc=>batch.delete(doc.ref));
+      return batch.commit();
+    }).catch(()=>{});
+  }
   ST.steps={};sv();rSteps();rStats();toast('✓ Schritt-Status gelöscht');
 }
 function clearAllData(){
-  if(!confirm('ALLE lokalen Daten löschen?\n\n• Schritt-Status\n• Berichte\n• Kommentare\n\nDas kann nicht rückgängig gemacht werden!'))return;
+  if(!confirm('ALLE Daten löschen?\n\n• Schritt-Status\n• Berichte\n• Kommentare\n\nAuch aus Firebase!'))return;
   if(!confirm('Wirklich alles löschen?'))return;
+  if(fbReady){
+    // Clear steps
+    db.collection('machines').doc(MACHINE).collection('steps').get().then(snap=>{const b=db.batch();snap.forEach(d=>b.delete(d.ref));return b.commit();}).catch(()=>{});
+    // Clear reports
+    db.collection('machines').doc(MACHINE).collection('reports').get().then(snap=>{const b=db.batch();snap.forEach(d=>b.delete(d.ref));return b.commit();}).catch(()=>{});
+  }
   ST={steps:{},reports:[]};sv();rSteps();rStats();rArchive();toast('✓ Alle Daten gelöscht');
 }
 
