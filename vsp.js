@@ -771,60 +771,7 @@ vi:{
 "V14.14":{d:"Ablauf unten Überströmventil",g:"Ventile im Bereich Ablauf",a:"DB12.2"},
 "V14.15":{d:"Ablauf unten Wärmetauscher über Lochblende",g:"Ventile im Bereich Ablauf",a:"DB12.1"},
 "V14.16":{d:"",g:"Ventile im Bereich Ablauf",a:"DB12.0"},
-,ctx:{
-"WT01":{
-  name:"Wärmetauscher WT01",
-  desc:"Wärmetauscher zur Erzeugung der Medientemperatur",
-  valves:["V8.10","V8.11","V8.12","UEV02"],
-  notes:[
-    {trigger:["11080","11090","11100"],text:"Benetzungsmedium für Integritätstest Sterilfilter. Millipore-Spezifikation: WFI-Temperatur 23°C ± 3°C. WT01 regelt die Medientemperatur über Kaltwasser-Vorlauf.",temp:"23°C ± 3°C",medium:"WFI"},
-    {trigger:["9280","9290","9300","9310"],text:"Sterilisation: WT01 heizt Medium auf Sterilisationstemperatur. Min. 121°C an allen aktiven TE-Sensoren. Temperatur darf zu keinem Zeitpunkt unterschritten werden.",temp:"≥ 121°C",medium:"Reindampf"},
-    {trigger:["9140","9150","9160","9170"],text:"Aufheizphase: WT01 bringt System auf Sterilisationstemperatur. Schrittzeit startet erst wenn alle Temperatursensoren den Minimalwert erreicht haben.",temp:"≥ 121°C",medium:"Reindampf"}
-  ]
 },
-"PT_SYSTEM":{
-  name:"Systemdruckgrenzen",
-  desc:"Maximale Systemdrücke (Festwerte, nicht veränderbar)",
-  valves:[],
-  notes:[
-    {trigger:["*"],text:"Max. Systemtemperatur: 135°C (TE01 fest). Max. Druck PT4/PT5: 2,50 bar. Max. Druck PT1/PT3/PT6: 3,00 bar."}
-  ]
-},
-"FN_SPUEL":{
-  name:"Füllnadel-Spülsystem",
-  desc:"Spülung der Füllnadeln über V13.5, V14.7, V14.8, V14.14, V14.15",
-  valves:["V13.5","V14.7","V14.8","V14.14","V14.15"],
-  notes:[
-    {trigger:["*"],text:"Taktfolgen XA-XP steuern die Füllnadel-Spülventile im 0,5s-Rhythmus nacheinander an. Zweck: gleichmäßige Durchspülung aller Füllstellen, Vermeidung von Totzonen."}
-  ]
-},
-"DOSI":{
-  name:"Dosierbehälter",
-  desc:"Dosiersystem mit Schlauchpumpen inkl. Dosierbehälter",
-  valves:["V4.7","V4.8","V4.13","V4.14","V10.1","V10.3"],
-  notes:[
-    {trigger:["*"],text:"X31/X49/X53: Füllstandskontrolle min./max. über Sonde LT1. X49 schließt bei max. Füllstand (2s verzögert). X53 schließt bei min. ODER max. Füllstand."}
-  ]
-},
-"BEGASUNG":{
-  name:"Begasungssystem",
-  desc:"Stickstoff/Prozessluft-Begasung der Füllstationen",
-  valves:["V14.1","V14.2","V14.3","V14.5","V14.6","V14.12"],
-  notes:[
-    {trigger:["*"],text:"X30: Stickstoff-Begasung (Standard). X30N: Prozessluft (alternative Einstellung im Parametersatz). X7: Ventile nur aktiv bei Begasungsprogrammen (Prog. 6, 7, 20, 21, 23). X29: nur mit SF-Rack."}
-  ]
-},
-"FILTER_IT":{
-  name:"Filterintegritätstest",
-  desc:"Integritätstest der Produktfilter",
-  valves:["V1.1","V1.7","V12.1"],
-  notes:[
-    {trigger:["11080","11090","11100","11110","2060","2070"],text:"Membranbenetzung mit WFI bei 23°C ± 3°C (Millipore-Spezifikation). V14.2 (X11) regelt EPOS-gesteuert den Durchfluss zum Wärmetauscher. Schrittzeit startet erst wenn Temperaturparameter erreicht sind."},
-    {trigger:["11120","11130","2080","2090"],text:"Druckhaltetest: nach Benetzung wird Testdruck aufgebaut und gehalten. Druckabfall wird überwacht zur Bestimmung der Filterintegrität."}
-  ]
-}
-}
-}},
 bl:{
 "Integritätstest Gasfilter Nr.5 nach SIP":"Integritätstest Gasfilter Nr.5 nach SIP",
 "Partikelmessung / Mikrobiologische Messung Begasungsstationen":"Partikelmessung / Mikrobiologische Messung Begasungsstationen",
@@ -850,5 +797,5 @@ bl:{
 "Trocknen und Kühlen":"Trocknen und Kühlen",
 "Formatwechsel durchführen":"Formatwechsel durchführen",
 "Ventilstellungen nach Abbruch":"Ventilstellungen nach Abbruch",
-}};
-window.dispatchEvent(new Event('vsp-ready'));
+},ctx:{"WT01":{name:"Wärmetauscher WT01",desc:"Wärmetauscher zur Erzeugung der Medientemperatur",valves:["V8.10","V8.11","V8.12","UEV02"],notes:[{trigger:["11080","11090","11100"],text:"Benetzungsmedium für Integritätstest Sterilfilter. Millipore-Spezifikation: WFI-Temperatur 23°C ± 3°C.",temp:"23°C ± 3°C",medium:"WFI"},{trigger:["9280","9290","9300","9310"],text:"Sterilisation: WT01 heizt auf Sterilisationstemperatur. Min. 121°C an allen aktiven TE-Sensoren.",temp:"≥ 121°C",medium:"Reindampf"},{trigger:["9140","9150","9160","9170"],text:"Aufheizphase: WT01 bringt System auf Sterilisationstemperatur.",temp:"≥ 121°C",medium:"Reindampf"}]},"PT_SYSTEM":{name:"Systemdruckgrenzen",desc:"Maximale Systemdrücke (Festwerte)",valves:[],notes:[{trigger:["*"],text:"Max. Systemtemperatur: 135°C (TE01 fest). Max. Druck PT4/PT5: 2,50 bar. Max. Druck PT1/PT3/PT6: 3,00 bar."}]},"FN_SPUEL":{name:"Füllnadel-Spülsystem",desc:"Spülung der Füllnadeln",valves:["V13.5","V14.7","V14.8","V14.14","V14.15"],notes:[{trigger:["*"],text:"Taktfolgen XA-XP steuern die Füllnadel-Spülventile im 0,5s-Rhythmus."}]},"DOSI":{name:"Dosierbehälter",desc:"Dosiersystem mit Schlauchpumpen",valves:["V4.7","V4.8","V4.13","V4.14","V10.1","V10.3"],notes:[{trigger:["*"],text:"X31/X49/X53: Füllstandskontrolle min./max. über Sonde LT1."}]},"BEGASUNG":{name:"Begasungssystem",desc:"Stickstoff/Prozessluft-Begasung",valves:["V14.1","V14.2","V14.3","V14.5","V14.6","V14.12"],notes:[{trigger:["*"],text:"X30: Stickstoff (Standard). X30N: Prozessluft. X7: nur bei Begasungsprogrammen."}]},"FILTER_IT":{name:"Filterintegritätstest",desc:"Integritätstest der Produktfilter",valves:["V1.1","V1.7","V12.1"],notes:[{trigger:["11080","11090","11100","11110","2060","2070"],text:"Membranbenetzung mit WFI bei 23°C ± 3°C (Millipore). V14.2 (X11) regelt EPOS-gesteuert den Durchfluss zum Wärmetauscher.",temp:"23°C ± 3°C",medium:"WFI"},{trigger:["11120","11130","2080","2090"],text:"Druckhaltetest: Testdruck aufgebaut und gehalten."}]}}
+};
